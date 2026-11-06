@@ -1,0 +1,637 @@
+{
+  "schema_version": 1,
+  "scope": "격리된 합성 시나리오에서 실제 예약 처리 함수를 호출한 수집 결과. HTTP 부하·실제 탐지 정확도·AI 성능 평가는 아님.",
+  "seed": 20261026,
+  "repeats": 10,
+  "scenario_count": 6,
+  "request_count": 180,
+  "label_counts": {
+    "normal": 160,
+    "abuse": 20
+  },
+  "decision_counts": {
+    "CONFIRMED": 113,
+    "CAPTCHA_REQUIRED": 17,
+    "BLOCKED": 50
+  },
+  "resource_checks_passed": true,
+  "identical_observation_pairs": 10,
+  "scenarios": [
+    {
+      "code": "independent",
+      "description": "서로 다른 IP·기기의 3명"
+    },
+    {
+      "code": "family_ip",
+      "description": "가족 3명: 같은 IP, 다른 기기, 쿠폰 없음"
+    },
+    {
+      "code": "shared_device",
+      "description": "공유 기기의 3명: 같은 IP·기기, 쿠폰 없음"
+    },
+    {
+      "code": "allowed_automation",
+      "description": "허용된 자동화: 한 계정으로 쿠폰 없이 3회 예약"
+    },
+    {
+      "code": "family_coupon",
+      "description": "가족 3명이 공유 기기에서 각자의 가입 쿠폰 사용"
+    },
+    {
+      "code": "coupon_abuse",
+      "description": "한 사람이 3계정으로 가입 혜택 반복 수령 시도"
+    }
+  ],
+  "rules": {
+    "MULTI_ACCOUNT_DEVICE": {
+      "enabled": true,
+      "score": 40,
+      "threshold": 2,
+      "window_minutes": 1440,
+      "description": "같은 기기에서 여러 계정 사용"
+    },
+    "MULTI_ACCOUNT_IP": {
+      "enabled": true,
+      "score": 30,
+      "threshold": 3,
+      "window_minutes": 1440,
+      "description": "같은 IP에서 여러 계정 사용"
+    },
+    "FAST_AFTER_OPEN": {
+      "enabled": true,
+      "score": 40,
+      "seconds": 3,
+      "description": "판매 오픈 직후 지나치게 빠른 예약"
+    },
+    "RAPID_REPEAT": {
+      "enabled": true,
+      "score": 30,
+      "threshold": 3,
+      "window_seconds": 60,
+      "description": "짧은 시간 동안 반복되는 예약 요청"
+    },
+    "COUPON_FARMING": {
+      "enabled": true,
+      "score": 30,
+      "threshold": 2,
+      "window_minutes": 1440,
+      "description": "현재 가입 쿠폰 사용 요청: 같은 IP 또는 기기의 여러 계정 가입 쿠폰 이력"
+    },
+    "COUPON_RETRY": {
+      "enabled": true,
+      "score": 20,
+      "threshold": 2,
+      "window_minutes": 60,
+      "description": "사용 불가 쿠폰으로 반복 예약 시도"
+    }
+  },
+  "thresholds": {
+    "captcha": 40,
+    "block": 70
+  },
+  "source_hashes": {
+    "rule_engine.py": "9040c6085d0129f6805082af9a0bc2eb50785f1f9bf2153bd9e07e658e8a7a0e",
+    "risk.py": "9a821d5398b41b7646ed9be4538f140f74953b78f74e80f9eaf7639692837bf5",
+    "models.py": "2a441a6f6a0d2c388283bb39a4d8854de08d38a810f3bb689ffae87e47bbcf48",
+    "routers/reservations.py": "b8b06fab51c5bf25bba09fd20b2eea6b0d1259ed60235268857c1e6ceb1fd9e2"
+  },
+  "groups": [
+    {
+      "run_id": "seed20261026-repeat000-independent",
+      "scenario": "independent",
+      "description": "서로 다른 IP·기기의 3명",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat000-family_ip",
+      "scenario": "family_ip",
+      "description": "가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 2,
+        "CAPTCHA_REQUIRED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat000-shared_device",
+      "scenario": "shared_device",
+      "description": "공유 기기의 3명: 같은 IP·기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 1,
+        "CAPTCHA_REQUIRED": 1,
+        "BLOCKED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat000-allowed_automation",
+      "scenario": "allowed_automation",
+      "description": "허용된 자동화: 한 계정으로 쿠폰 없이 3회 예약",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat000-family_coupon",
+      "scenario": "family_coupon",
+      "description": "가족 3명이 공유 기기에서 각자의 가입 쿠폰 사용",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat000-coupon_abuse",
+      "scenario": "coupon_abuse",
+      "description": "한 사람이 3계정으로 가입 혜택 반복 수령 시도",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat001-independent",
+      "scenario": "independent",
+      "description": "서로 다른 IP·기기의 3명",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat001-family_ip",
+      "scenario": "family_ip",
+      "description": "가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat001-shared_device",
+      "scenario": "shared_device",
+      "description": "공유 기기의 3명: 같은 IP·기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 1,
+        "CAPTCHA_REQUIRED": 1,
+        "BLOCKED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat001-allowed_automation",
+      "scenario": "allowed_automation",
+      "description": "허용된 자동화: 한 계정으로 쿠폰 없이 3회 예약",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat001-family_coupon",
+      "scenario": "family_coupon",
+      "description": "가족 3명이 공유 기기에서 각자의 가입 쿠폰 사용",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat001-coupon_abuse",
+      "scenario": "coupon_abuse",
+      "description": "한 사람이 3계정으로 가입 혜택 반복 수령 시도",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat002-independent",
+      "scenario": "independent",
+      "description": "서로 다른 IP·기기의 3명",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat002-family_ip",
+      "scenario": "family_ip",
+      "description": "가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 2,
+        "CAPTCHA_REQUIRED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat002-shared_device",
+      "scenario": "shared_device",
+      "description": "공유 기기의 3명: 같은 IP·기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 1,
+        "CAPTCHA_REQUIRED": 1,
+        "BLOCKED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat002-allowed_automation",
+      "scenario": "allowed_automation",
+      "description": "허용된 자동화: 한 계정으로 쿠폰 없이 3회 예약",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat002-family_coupon",
+      "scenario": "family_coupon",
+      "description": "가족 3명이 공유 기기에서 각자의 가입 쿠폰 사용",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat002-coupon_abuse",
+      "scenario": "coupon_abuse",
+      "description": "한 사람이 3계정으로 가입 혜택 반복 수령 시도",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat003-independent",
+      "scenario": "independent",
+      "description": "서로 다른 IP·기기의 3명",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat003-family_ip",
+      "scenario": "family_ip",
+      "description": "가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 2,
+        "CAPTCHA_REQUIRED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat003-shared_device",
+      "scenario": "shared_device",
+      "description": "공유 기기의 3명: 같은 IP·기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 1,
+        "CAPTCHA_REQUIRED": 1,
+        "BLOCKED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat003-allowed_automation",
+      "scenario": "allowed_automation",
+      "description": "허용된 자동화: 한 계정으로 쿠폰 없이 3회 예약",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat003-family_coupon",
+      "scenario": "family_coupon",
+      "description": "가족 3명이 공유 기기에서 각자의 가입 쿠폰 사용",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat003-coupon_abuse",
+      "scenario": "coupon_abuse",
+      "description": "한 사람이 3계정으로 가입 혜택 반복 수령 시도",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat004-independent",
+      "scenario": "independent",
+      "description": "서로 다른 IP·기기의 3명",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat004-family_ip",
+      "scenario": "family_ip",
+      "description": "가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat004-shared_device",
+      "scenario": "shared_device",
+      "description": "공유 기기의 3명: 같은 IP·기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 1,
+        "CAPTCHA_REQUIRED": 1,
+        "BLOCKED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat004-allowed_automation",
+      "scenario": "allowed_automation",
+      "description": "허용된 자동화: 한 계정으로 쿠폰 없이 3회 예약",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat004-family_coupon",
+      "scenario": "family_coupon",
+      "description": "가족 3명이 공유 기기에서 각자의 가입 쿠폰 사용",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat004-coupon_abuse",
+      "scenario": "coupon_abuse",
+      "description": "한 사람이 3계정으로 가입 혜택 반복 수령 시도",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat005-independent",
+      "scenario": "independent",
+      "description": "서로 다른 IP·기기의 3명",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat005-family_ip",
+      "scenario": "family_ip",
+      "description": "가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 2,
+        "CAPTCHA_REQUIRED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat005-shared_device",
+      "scenario": "shared_device",
+      "description": "공유 기기의 3명: 같은 IP·기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 1,
+        "CAPTCHA_REQUIRED": 1,
+        "BLOCKED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat005-allowed_automation",
+      "scenario": "allowed_automation",
+      "description": "허용된 자동화: 한 계정으로 쿠폰 없이 3회 예약",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat005-family_coupon",
+      "scenario": "family_coupon",
+      "description": "가족 3명이 공유 기기에서 각자의 가입 쿠폰 사용",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat005-coupon_abuse",
+      "scenario": "coupon_abuse",
+      "description": "한 사람이 3계정으로 가입 혜택 반복 수령 시도",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat006-independent",
+      "scenario": "independent",
+      "description": "서로 다른 IP·기기의 3명",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat006-family_ip",
+      "scenario": "family_ip",
+      "description": "가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 2,
+        "CAPTCHA_REQUIRED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat006-shared_device",
+      "scenario": "shared_device",
+      "description": "공유 기기의 3명: 같은 IP·기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 1,
+        "CAPTCHA_REQUIRED": 1,
+        "BLOCKED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat006-allowed_automation",
+      "scenario": "allowed_automation",
+      "description": "허용된 자동화: 한 계정으로 쿠폰 없이 3회 예약",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat006-family_coupon",
+      "scenario": "family_coupon",
+      "description": "가족 3명이 공유 기기에서 각자의 가입 쿠폰 사용",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat006-coupon_abuse",
+      "scenario": "coupon_abuse",
+      "description": "한 사람이 3계정으로 가입 혜택 반복 수령 시도",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat007-independent",
+      "scenario": "independent",
+      "description": "서로 다른 IP·기기의 3명",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat007-family_ip",
+      "scenario": "family_ip",
+      "description": "가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat007-shared_device",
+      "scenario": "shared_device",
+      "description": "공유 기기의 3명: 같은 IP·기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 1,
+        "CAPTCHA_REQUIRED": 1,
+        "BLOCKED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat007-allowed_automation",
+      "scenario": "allowed_automation",
+      "description": "허용된 자동화: 한 계정으로 쿠폰 없이 3회 예약",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat007-family_coupon",
+      "scenario": "family_coupon",
+      "description": "가족 3명이 공유 기기에서 각자의 가입 쿠폰 사용",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat007-coupon_abuse",
+      "scenario": "coupon_abuse",
+      "description": "한 사람이 3계정으로 가입 혜택 반복 수령 시도",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat008-independent",
+      "scenario": "independent",
+      "description": "서로 다른 IP·기기의 3명",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat008-family_ip",
+      "scenario": "family_ip",
+      "description": "가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 2,
+        "CAPTCHA_REQUIRED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat008-shared_device",
+      "scenario": "shared_device",
+      "description": "공유 기기의 3명: 같은 IP·기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 1,
+        "CAPTCHA_REQUIRED": 1,
+        "BLOCKED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat008-allowed_automation",
+      "scenario": "allowed_automation",
+      "description": "허용된 자동화: 한 계정으로 쿠폰 없이 3회 예약",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat008-family_coupon",
+      "scenario": "family_coupon",
+      "description": "가족 3명이 공유 기기에서 각자의 가입 쿠폰 사용",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat008-coupon_abuse",
+      "scenario": "coupon_abuse",
+      "description": "한 사람이 3계정으로 가입 혜택 반복 수령 시도",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat009-independent",
+      "scenario": "independent",
+      "description": "서로 다른 IP·기기의 3명",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat009-family_ip",
+      "scenario": "family_ip",
+      "description": "가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 2,
+        "CAPTCHA_REQUIRED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat009-shared_device",
+      "scenario": "shared_device",
+      "description": "공유 기기의 3명: 같은 IP·기기, 쿠폰 없음",
+      "decisions": {
+        "CONFIRMED": 1,
+        "CAPTCHA_REQUIRED": 1,
+        "BLOCKED": 1
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat009-allowed_automation",
+      "scenario": "allowed_automation",
+      "description": "허용된 자동화: 한 계정으로 쿠폰 없이 3회 예약",
+      "decisions": {
+        "CONFIRMED": 3
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat009-family_coupon",
+      "scenario": "family_coupon",
+      "description": "가족 3명이 공유 기기에서 각자의 가입 쿠폰 사용",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    },
+    {
+      "run_id": "seed20261026-repeat009-coupon_abuse",
+      "scenario": "coupon_abuse",
+      "description": "한 사람이 3계정으로 가입 혜택 반복 수령 시도",
+      "decisions": {
+        "CONFIRMED": 1,
+        "BLOCKED": 2
+      }
+    }
+  ],
+  "notes": [
+    "실험 시간은 고정 시계로 진행하며 실제로 60초를 기다리지 않습니다.",
+    "회원과 쿠폰은 실험용으로 준비하고 가입 시점 이벤트를 재현합니다.",
+    "CAPTCHA 해결·예약 취소·동시성·만료 쿠폰은 이번 수집 범위에 포함하지 않습니다.",
+    "정답은 사전에 정한 시나리오 정책이며 실제 부정 이용 확인 결과가 아닙니다.",
+    "가족과 혜택 남용 비교쌍은 동일한 관측 정보에 다른 정답이 있습니다. 현재 특징만으로 완벽히 구별할 수 없습니다.",
+    "모델 학습 시 ID·시나리오·판정·점수·사유·검사 결과는 입력에서 제외하세요.",
+    "같은 split_group의 행은 학습과 평가에 나누어 넣지 마세요. 분할만으로 실제 서비스 일반화가 보장되지 않습니다.",
+    "남용 요청 비율은 실험 설계에 의해 정해지며 실제 서비스 발생률이 아닙니다."
+  ]
+}

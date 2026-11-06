@@ -1,0 +1,106 @@
+{
+  "scope": "고정된 합성 요청 기록에 대한 오프라인 정책 비교. 실제 서비스 성능 평가 아님.",
+  "source": "/Users/ilaeeun/Desktop/alarm-flight-main/experiments/scenario_data_20261026_170411_696794/requests.csv",
+  "request_count": 180,
+  "policy": "기존 BLOCKED 중 공유 IP/기기 신호가 있고, 사유가 IP·기기·가입쿠폰·반복요청 규칙으로만 구성된 요청을 REVIEW_REQUIRED로 전환",
+  "results": [
+    {
+      "label": "normal",
+      "count": 160,
+      "before": {
+        "CONFIRMED": 113,
+        "CAPTCHA_REQUIRED": 17,
+        "BLOCKED": 30
+      },
+      "after": {
+        "CONFIRMED": 113,
+        "CAPTCHA_REQUIRED": 17,
+        "REVIEW_REQUIRED": 30
+      }
+    },
+    {
+      "label": "abuse",
+      "count": 20,
+      "before": {
+        "BLOCKED": 20
+      },
+      "after": {
+        "REVIEW_REQUIRED": 20
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario": "independent",
+      "before": {
+        "CONFIRMED": 30
+      },
+      "after": {
+        "CONFIRMED": 30
+      }
+    },
+    {
+      "scenario": "family_ip",
+      "before": {
+        "CONFIRMED": 23,
+        "CAPTCHA_REQUIRED": 7
+      },
+      "after": {
+        "CONFIRMED": 23,
+        "CAPTCHA_REQUIRED": 7
+      }
+    },
+    {
+      "scenario": "shared_device",
+      "before": {
+        "CONFIRMED": 10,
+        "CAPTCHA_REQUIRED": 10,
+        "BLOCKED": 10
+      },
+      "after": {
+        "CONFIRMED": 10,
+        "CAPTCHA_REQUIRED": 10,
+        "REVIEW_REQUIRED": 10
+      }
+    },
+    {
+      "scenario": "allowed_automation",
+      "before": {
+        "CONFIRMED": 30
+      },
+      "after": {
+        "CONFIRMED": 30
+      }
+    },
+    {
+      "scenario": "family_coupon",
+      "before": {
+        "CONFIRMED": 10,
+        "BLOCKED": 20
+      },
+      "after": {
+        "CONFIRMED": 10,
+        "REVIEW_REQUIRED": 20
+      }
+    },
+    {
+      "scenario": "coupon_abuse",
+      "before": {
+        "CONFIRMED": 10,
+        "BLOCKED": 20
+      },
+      "after": {
+        "CONFIRMED": 10,
+        "REVIEW_REQUIRED": 20
+      }
+    }
+  ],
+  "notes": [
+    "REVIEW_REQUIRED는 비교용 가상 판정입니다. 서버에 구현한 상태가 아닙니다.",
+    "추가 확인의 성공·실패, 최종 예약 여부 및 좌석·쿠폰 처리는 평가하지 않았습니다.",
+    "이전 요청의 판정이 달라졌을 때 이후 특징이 바뀌는 효과는 재현하지 않았습니다.",
+    "추가 확인은 현재의 간단한 CAPTCHA와 다릅니다. 실제 사람별 혜택 자격 확인 절차는 미구현입니다.",
+    "정상 차단 감소와 함께 남용 요청의 즉시 차단도 감소합니다. 우수한 정책임을 입증하는 실험이 아닙니다.",
+    "label은 집계에만 사용하며 정책 판정에는 사용하지 않습니다."
+  ]
+}

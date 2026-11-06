@@ -1,0 +1,33 @@
+﻿variant,scenario,description,sequence,expected,actual,rule_score,risk_score,reasons,seats_before,seats_after,decision_matches,seat_check
+baseline,independent,각자 다른 IP·기기 정상 이용,1,CONFIRMED,CONFIRMED,0.0,0.0,,20,19,True,True
+baseline,independent,각자 다른 IP·기기 정상 이용,2,CONFIRMED,CONFIRMED,0.0,0.0,,19,18,True,True
+baseline,independent,각자 다른 IP·기기 정상 이용,3,CONFIRMED,CONFIRMED,0.0,0.0,,18,17,True,True
+baseline,shared_ip,"가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",1,CONFIRMED,CONFIRMED,0.0,0.0,,20,19,True,True
+baseline,shared_ip,"가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",2,CONFIRMED,CONFIRMED,0.0,0.0,,19,18,True,True
+baseline,shared_ip,"가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",3,CAPTCHA_REQUIRED,CAPTCHA_REQUIRED,60.0,60.0,MULTI_ACCOUNT_IP(+30): 같은 IP에서 여러 계정 사용 - IP 192.0.2.1 에서 계정 3개 (기준 3개) | RAPID_REPEAT(+30): 짧은 시간 동안 반복되는 예약 요청 - 60초 동안 3회 요청 (기준 3회),18,18,True,True
+baseline,distributed,"분산 자동화 가정: 같은 IP, 다른 기기 ID의 3계정, 쿠폰 없음",1,CONFIRMED,CONFIRMED,0.0,0.0,,20,19,True,True
+baseline,distributed,"분산 자동화 가정: 같은 IP, 다른 기기 ID의 3계정, 쿠폰 없음",2,CONFIRMED,CONFIRMED,0.0,0.0,,19,18,True,True
+baseline,distributed,"분산 자동화 가정: 같은 IP, 다른 기기 ID의 3계정, 쿠폰 없음",3,CAPTCHA_REQUIRED,CAPTCHA_REQUIRED,60.0,60.0,MULTI_ACCOUNT_IP(+30): 같은 IP에서 여러 계정 사용 - IP 192.0.2.1 에서 계정 3개 (기준 3개) | RAPID_REPEAT(+30): 짧은 시간 동안 반복되는 예약 요청 - 60초 동안 3회 요청 (기준 3회),18,18,True,True
+baseline,shared_device,"공유 기기 2명: 다른 IP, 쿠폰 없음",1,CONFIRMED,CONFIRMED,0.0,0.0,,20,19,True,True
+baseline,shared_device,"공유 기기 2명: 다른 IP, 쿠폰 없음",2,CAPTCHA_REQUIRED,CAPTCHA_REQUIRED,40.0,40.0,MULTI_ACCOUNT_DEVICE(+40): 같은 기기에서 여러 계정 사용 - 기기 shared-test-device 에서 계정 2개 (기준 2개),19,19,True,True
+baseline,coupon_accounts,같은 IP·기기 2계정 가입 쿠폰 사용,1,CONFIRMED,CONFIRMED,0.0,0.0,,20,19,True,True
+baseline,coupon_accounts,같은 IP·기기 2계정 가입 쿠폰 사용,2,BLOCKED,BLOCKED,70.0,70.0,MULTI_ACCOUNT_DEVICE(+40): 같은 기기에서 여러 계정 사용 - 기기 shared-test-device 에서 계정 2개 (기준 2개) | COUPON_FARMING(+30): 같은 IP·기기에서 여러 계정의 가입 쿠폰 사용 - 가입 쿠폰 사용 계정 2개 (기준 2개),19,19,True,True
+baseline,repeat,"한 계정의 빠른 예약 요청 3회, 쿠폰 없음",1,CONFIRMED,CONFIRMED,0.0,0.0,,20,19,True,True
+baseline,repeat,"한 계정의 빠른 예약 요청 3회, 쿠폰 없음",2,CONFIRMED,CONFIRMED,0.0,0.0,,19,18,True,True
+baseline,repeat,"한 계정의 빠른 예약 요청 3회, 쿠폰 없음",3,CONFIRMED,CONFIRMED,30.0,30.0,RAPID_REPEAT(+30): 짧은 시간 동안 반복되는 예약 요청 - 60초 동안 3회 요청 (기준 3회),18,17,True,True
+account_only,independent,각자 다른 IP·기기 정상 이용,1,CONFIRMED,CONFIRMED,0.0,0.0,,20,19,True,True
+account_only,independent,각자 다른 IP·기기 정상 이용,2,CONFIRMED,CONFIRMED,0.0,0.0,,19,18,True,True
+account_only,independent,각자 다른 IP·기기 정상 이용,3,CONFIRMED,CONFIRMED,0.0,0.0,,18,17,True,True
+account_only,shared_ip,"가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",1,CONFIRMED,CONFIRMED,0.0,0.0,,20,19,True,True
+account_only,shared_ip,"가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",2,CONFIRMED,CONFIRMED,0.0,0.0,,19,18,True,True
+account_only,shared_ip,"가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",3,CONFIRMED,CONFIRMED,30.0,30.0,MULTI_ACCOUNT_IP(+30): 같은 IP에서 여러 계정 사용 - IP 192.0.2.1 에서 계정 3개 (기준 3개),18,17,True,True
+account_only,distributed,"분산 자동화 가정: 같은 IP, 다른 기기 ID의 3계정, 쿠폰 없음",1,CONFIRMED,CONFIRMED,0.0,0.0,,20,19,True,True
+account_only,distributed,"분산 자동화 가정: 같은 IP, 다른 기기 ID의 3계정, 쿠폰 없음",2,CONFIRMED,CONFIRMED,0.0,0.0,,19,18,True,True
+account_only,distributed,"분산 자동화 가정: 같은 IP, 다른 기기 ID의 3계정, 쿠폰 없음",3,CONFIRMED,CONFIRMED,30.0,30.0,MULTI_ACCOUNT_IP(+30): 같은 IP에서 여러 계정 사용 - IP 192.0.2.1 에서 계정 3개 (기준 3개),18,17,True,True
+account_only,shared_device,"공유 기기 2명: 다른 IP, 쿠폰 없음",1,CONFIRMED,CONFIRMED,0.0,0.0,,20,19,True,True
+account_only,shared_device,"공유 기기 2명: 다른 IP, 쿠폰 없음",2,CAPTCHA_REQUIRED,CAPTCHA_REQUIRED,40.0,40.0,MULTI_ACCOUNT_DEVICE(+40): 같은 기기에서 여러 계정 사용 - 기기 shared-test-device 에서 계정 2개 (기준 2개),19,19,True,True
+account_only,coupon_accounts,같은 IP·기기 2계정 가입 쿠폰 사용,1,CONFIRMED,CONFIRMED,0.0,0.0,,20,19,True,True
+account_only,coupon_accounts,같은 IP·기기 2계정 가입 쿠폰 사용,2,BLOCKED,BLOCKED,70.0,70.0,MULTI_ACCOUNT_DEVICE(+40): 같은 기기에서 여러 계정 사용 - 기기 shared-test-device 에서 계정 2개 (기준 2개) | COUPON_FARMING(+30): 같은 IP·기기에서 여러 계정의 가입 쿠폰 사용 - 가입 쿠폰 사용 계정 2개 (기준 2개),19,19,True,True
+account_only,repeat,"한 계정의 빠른 예약 요청 3회, 쿠폰 없음",1,CONFIRMED,CONFIRMED,0.0,0.0,,20,19,True,True
+account_only,repeat,"한 계정의 빠른 예약 요청 3회, 쿠폰 없음",2,CONFIRMED,CONFIRMED,0.0,0.0,,19,18,True,True
+account_only,repeat,"한 계정의 빠른 예약 요청 3회, 쿠폰 없음",3,CONFIRMED,CONFIRMED,30.0,30.0,RAPID_REPEAT(+30): 짧은 시간 동안 반복되는 예약 요청 - 60초 동안 3회 요청 (기준 3회),18,17,True,True

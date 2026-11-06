@@ -1,0 +1,239 @@
+{
+  "scope": "통제된 합성 이벤트를 통한 행동 정보 계산 함수 검증. HTTP 예약 흐름·탐지 정확도·AI 성능 평가는 아님.",
+  "rule_engine_sha256": "908b8d01b620094b5a9a13895b0ae9e3cacd379dece4659f56519bb50fbba275",
+  "scenario_count": 10,
+  "passed_count": 10,
+  "all_checks_passed": true,
+  "results": [
+    {
+      "scenario": "first",
+      "description": "이전 요청 없음",
+      "passed": true,
+      "expected": {
+        "seconds_since_previous_account_attempt": null,
+        "prior_ip_account_count_60s": 0,
+        "prior_ip_attempt_count_60s": 0,
+        "prior_ip_same_flight_attempt_count_60s": 0,
+        "prior_ip_same_flight_ratio_60s": null,
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60
+      },
+      "actual": {
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60,
+        "seconds_since_previous_account_attempt": null,
+        "prior_ip_account_count_60s": 0,
+        "prior_ip_attempt_count_60s": 0,
+        "prior_ip_same_flight_attempt_count_60s": 0,
+        "prior_ip_same_flight_ratio_60s": null
+      }
+    },
+    {
+      "scenario": "repeat",
+      "description": "10초 전 같은 계정·항공편 요청",
+      "passed": true,
+      "expected": {
+        "seconds_since_previous_account_attempt": 10,
+        "prior_ip_account_count_60s": 1,
+        "prior_ip_attempt_count_60s": 1,
+        "prior_ip_same_flight_attempt_count_60s": 1,
+        "prior_ip_same_flight_ratio_60s": 1,
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60
+      },
+      "actual": {
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60,
+        "seconds_since_previous_account_attempt": 10.0,
+        "prior_ip_account_count_60s": 1,
+        "prior_ip_attempt_count_60s": 1,
+        "prior_ip_same_flight_attempt_count_60s": 1,
+        "prior_ip_same_flight_ratio_60s": 1.0
+      }
+    },
+    {
+      "scenario": "multi_account",
+      "description": "같은 IP의 다른 계정과 다른 항공편",
+      "passed": true,
+      "expected": {
+        "seconds_since_previous_account_attempt": 20,
+        "prior_ip_account_count_60s": 2,
+        "prior_ip_attempt_count_60s": 2,
+        "prior_ip_same_flight_attempt_count_60s": 1,
+        "prior_ip_same_flight_ratio_60s": 0.5,
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60
+      },
+      "actual": {
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60,
+        "seconds_since_previous_account_attempt": 20.0,
+        "prior_ip_account_count_60s": 2,
+        "prior_ip_attempt_count_60s": 2,
+        "prior_ip_same_flight_attempt_count_60s": 1,
+        "prior_ip_same_flight_ratio_60s": 0.5
+      }
+    },
+    {
+      "scenario": "expired",
+      "description": "61초 전 기록은 60초 집계에서 제외",
+      "passed": true,
+      "expected": {
+        "seconds_since_previous_account_attempt": 61,
+        "prior_ip_account_count_60s": 0,
+        "prior_ip_attempt_count_60s": 0,
+        "prior_ip_same_flight_attempt_count_60s": 0,
+        "prior_ip_same_flight_ratio_60s": null,
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60
+      },
+      "actual": {
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60,
+        "seconds_since_previous_account_attempt": 61.0,
+        "prior_ip_account_count_60s": 0,
+        "prior_ip_attempt_count_60s": 0,
+        "prior_ip_same_flight_attempt_count_60s": 0,
+        "prior_ip_same_flight_ratio_60s": null
+      }
+    },
+    {
+      "scenario": "boundary",
+      "description": "정확히 60초 전 포함, 현재·미래 제외",
+      "passed": true,
+      "expected": {
+        "seconds_since_previous_account_attempt": 60,
+        "prior_ip_account_count_60s": 1,
+        "prior_ip_attempt_count_60s": 1,
+        "prior_ip_same_flight_attempt_count_60s": 1,
+        "prior_ip_same_flight_ratio_60s": 1,
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60
+      },
+      "actual": {
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60,
+        "seconds_since_previous_account_attempt": 60.0,
+        "prior_ip_account_count_60s": 1,
+        "prior_ip_attempt_count_60s": 1,
+        "prior_ip_same_flight_attempt_count_60s": 1,
+        "prior_ip_same_flight_ratio_60s": 1.0
+      }
+    },
+    {
+      "scenario": "other_events",
+      "description": "상세 조회·검색·CAPTCHA 제외",
+      "passed": true,
+      "expected": {
+        "seconds_since_previous_account_attempt": null,
+        "prior_ip_account_count_60s": 0,
+        "prior_ip_attempt_count_60s": 0,
+        "prior_ip_same_flight_attempt_count_60s": 0,
+        "prior_ip_same_flight_ratio_60s": null,
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60
+      },
+      "actual": {
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60,
+        "seconds_since_previous_account_attempt": null,
+        "prior_ip_account_count_60s": 0,
+        "prior_ip_attempt_count_60s": 0,
+        "prior_ip_same_flight_attempt_count_60s": 0,
+        "prior_ip_same_flight_ratio_60s": null
+      }
+    },
+    {
+      "scenario": "other_ip",
+      "description": "다른 IP는 IP 집계에서 제외",
+      "passed": true,
+      "expected": {
+        "seconds_since_previous_account_attempt": 12,
+        "prior_ip_account_count_60s": 0,
+        "prior_ip_attempt_count_60s": 0,
+        "prior_ip_same_flight_attempt_count_60s": 0,
+        "prior_ip_same_flight_ratio_60s": null,
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60
+      },
+      "actual": {
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60,
+        "seconds_since_previous_account_attempt": 12.0,
+        "prior_ip_account_count_60s": 0,
+        "prior_ip_attempt_count_60s": 0,
+        "prior_ip_same_flight_attempt_count_60s": 0,
+        "prior_ip_same_flight_ratio_60s": null
+      }
+    },
+    {
+      "scenario": "missing_ip",
+      "description": "현재 IP 없음은 0 대신 결측값",
+      "passed": true,
+      "expected": {
+        "seconds_since_previous_account_attempt": 12,
+        "prior_ip_account_count_60s": null,
+        "prior_ip_attempt_count_60s": null,
+        "prior_ip_same_flight_attempt_count_60s": null,
+        "prior_ip_same_flight_ratio_60s": null,
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60
+      },
+      "actual": {
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60,
+        "seconds_since_previous_account_attempt": 12.0,
+        "prior_ip_account_count_60s": null,
+        "prior_ip_attempt_count_60s": null,
+        "prior_ip_same_flight_attempt_count_60s": null,
+        "prior_ip_same_flight_ratio_60s": null
+      }
+    },
+    {
+      "scenario": "rejected",
+      "description": "회원·항공편 불명인 거절도 요청 수에 포함",
+      "passed": true,
+      "expected": {
+        "seconds_since_previous_account_attempt": 15,
+        "prior_ip_account_count_60s": 1,
+        "prior_ip_attempt_count_60s": 2,
+        "prior_ip_same_flight_attempt_count_60s": 1,
+        "prior_ip_same_flight_ratio_60s": 0.5,
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60
+      },
+      "actual": {
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60,
+        "seconds_since_previous_account_attempt": 15.0,
+        "prior_ip_account_count_60s": 1,
+        "prior_ip_attempt_count_60s": 2,
+        "prior_ip_same_flight_attempt_count_60s": 1,
+        "prior_ip_same_flight_ratio_60s": 0.5
+      }
+    },
+    {
+      "scenario": "distinct_users",
+      "description": "같은 계정 2회는 계정 수 1개",
+      "passed": true,
+      "expected": {
+        "seconds_since_previous_account_attempt": 5,
+        "prior_ip_account_count_60s": 1,
+        "prior_ip_attempt_count_60s": 2,
+        "prior_ip_same_flight_attempt_count_60s": 2,
+        "prior_ip_same_flight_ratio_60s": 1,
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60
+      },
+      "actual": {
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60,
+        "seconds_since_previous_account_attempt": 5.0,
+        "prior_ip_account_count_60s": 1,
+        "prior_ip_attempt_count_60s": 2,
+        "prior_ip_same_flight_attempt_count_60s": 2,
+        "prior_ip_same_flight_ratio_60s": 1.0
+      }
+    }
+  ]
+}

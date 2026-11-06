@@ -1,0 +1,71 @@
+﻿scenario,description,feature,expected,actual,passed
+first,이전 요청 없음,seconds_since_previous_account_attempt,null,null,True
+first,이전 요청 없음,prior_ip_account_count_60s,0,0,True
+first,이전 요청 없음,prior_ip_attempt_count_60s,0,0,True
+first,이전 요청 없음,prior_ip_same_flight_attempt_count_60s,0,0,True
+first,이전 요청 없음,prior_ip_same_flight_ratio_60s,null,null,True
+first,이전 요청 없음,behavior_feature_version,1,1,True
+first,이전 요청 없음,behavior_window_seconds,60,60,True
+repeat,10초 전 같은 계정·항공편 요청,seconds_since_previous_account_attempt,10,10.0,True
+repeat,10초 전 같은 계정·항공편 요청,prior_ip_account_count_60s,1,1,True
+repeat,10초 전 같은 계정·항공편 요청,prior_ip_attempt_count_60s,1,1,True
+repeat,10초 전 같은 계정·항공편 요청,prior_ip_same_flight_attempt_count_60s,1,1,True
+repeat,10초 전 같은 계정·항공편 요청,prior_ip_same_flight_ratio_60s,1,1.0,True
+repeat,10초 전 같은 계정·항공편 요청,behavior_feature_version,1,1,True
+repeat,10초 전 같은 계정·항공편 요청,behavior_window_seconds,60,60,True
+multi_account,같은 IP의 다른 계정과 다른 항공편,seconds_since_previous_account_attempt,20,20.0,True
+multi_account,같은 IP의 다른 계정과 다른 항공편,prior_ip_account_count_60s,2,2,True
+multi_account,같은 IP의 다른 계정과 다른 항공편,prior_ip_attempt_count_60s,2,2,True
+multi_account,같은 IP의 다른 계정과 다른 항공편,prior_ip_same_flight_attempt_count_60s,1,1,True
+multi_account,같은 IP의 다른 계정과 다른 항공편,prior_ip_same_flight_ratio_60s,0.5,0.5,True
+multi_account,같은 IP의 다른 계정과 다른 항공편,behavior_feature_version,1,1,True
+multi_account,같은 IP의 다른 계정과 다른 항공편,behavior_window_seconds,60,60,True
+expired,61초 전 기록은 60초 집계에서 제외,seconds_since_previous_account_attempt,61,61.0,True
+expired,61초 전 기록은 60초 집계에서 제외,prior_ip_account_count_60s,0,0,True
+expired,61초 전 기록은 60초 집계에서 제외,prior_ip_attempt_count_60s,0,0,True
+expired,61초 전 기록은 60초 집계에서 제외,prior_ip_same_flight_attempt_count_60s,0,0,True
+expired,61초 전 기록은 60초 집계에서 제외,prior_ip_same_flight_ratio_60s,null,null,True
+expired,61초 전 기록은 60초 집계에서 제외,behavior_feature_version,1,1,True
+expired,61초 전 기록은 60초 집계에서 제외,behavior_window_seconds,60,60,True
+boundary,"정확히 60초 전 포함, 현재·미래 제외",seconds_since_previous_account_attempt,60,60.0,True
+boundary,"정확히 60초 전 포함, 현재·미래 제외",prior_ip_account_count_60s,1,1,True
+boundary,"정확히 60초 전 포함, 현재·미래 제외",prior_ip_attempt_count_60s,1,1,True
+boundary,"정확히 60초 전 포함, 현재·미래 제외",prior_ip_same_flight_attempt_count_60s,1,1,True
+boundary,"정확히 60초 전 포함, 현재·미래 제외",prior_ip_same_flight_ratio_60s,1,1.0,True
+boundary,"정확히 60초 전 포함, 현재·미래 제외",behavior_feature_version,1,1,True
+boundary,"정확히 60초 전 포함, 현재·미래 제외",behavior_window_seconds,60,60,True
+other_events,상세 조회·검색·CAPTCHA 제외,seconds_since_previous_account_attempt,null,null,True
+other_events,상세 조회·검색·CAPTCHA 제외,prior_ip_account_count_60s,0,0,True
+other_events,상세 조회·검색·CAPTCHA 제외,prior_ip_attempt_count_60s,0,0,True
+other_events,상세 조회·검색·CAPTCHA 제외,prior_ip_same_flight_attempt_count_60s,0,0,True
+other_events,상세 조회·검색·CAPTCHA 제외,prior_ip_same_flight_ratio_60s,null,null,True
+other_events,상세 조회·검색·CAPTCHA 제외,behavior_feature_version,1,1,True
+other_events,상세 조회·검색·CAPTCHA 제외,behavior_window_seconds,60,60,True
+other_ip,다른 IP는 IP 집계에서 제외,seconds_since_previous_account_attempt,12,12.0,True
+other_ip,다른 IP는 IP 집계에서 제외,prior_ip_account_count_60s,0,0,True
+other_ip,다른 IP는 IP 집계에서 제외,prior_ip_attempt_count_60s,0,0,True
+other_ip,다른 IP는 IP 집계에서 제외,prior_ip_same_flight_attempt_count_60s,0,0,True
+other_ip,다른 IP는 IP 집계에서 제외,prior_ip_same_flight_ratio_60s,null,null,True
+other_ip,다른 IP는 IP 집계에서 제외,behavior_feature_version,1,1,True
+other_ip,다른 IP는 IP 집계에서 제외,behavior_window_seconds,60,60,True
+missing_ip,현재 IP 없음은 0 대신 결측값,seconds_since_previous_account_attempt,12,12.0,True
+missing_ip,현재 IP 없음은 0 대신 결측값,prior_ip_account_count_60s,null,null,True
+missing_ip,현재 IP 없음은 0 대신 결측값,prior_ip_attempt_count_60s,null,null,True
+missing_ip,현재 IP 없음은 0 대신 결측값,prior_ip_same_flight_attempt_count_60s,null,null,True
+missing_ip,현재 IP 없음은 0 대신 결측값,prior_ip_same_flight_ratio_60s,null,null,True
+missing_ip,현재 IP 없음은 0 대신 결측값,behavior_feature_version,1,1,True
+missing_ip,현재 IP 없음은 0 대신 결측값,behavior_window_seconds,60,60,True
+rejected,회원·항공편 불명인 거절도 요청 수에 포함,seconds_since_previous_account_attempt,15,15.0,True
+rejected,회원·항공편 불명인 거절도 요청 수에 포함,prior_ip_account_count_60s,1,1,True
+rejected,회원·항공편 불명인 거절도 요청 수에 포함,prior_ip_attempt_count_60s,2,2,True
+rejected,회원·항공편 불명인 거절도 요청 수에 포함,prior_ip_same_flight_attempt_count_60s,1,1,True
+rejected,회원·항공편 불명인 거절도 요청 수에 포함,prior_ip_same_flight_ratio_60s,0.5,0.5,True
+rejected,회원·항공편 불명인 거절도 요청 수에 포함,behavior_feature_version,1,1,True
+rejected,회원·항공편 불명인 거절도 요청 수에 포함,behavior_window_seconds,60,60,True
+distinct_users,같은 계정 2회는 계정 수 1개,seconds_since_previous_account_attempt,5,5.0,True
+distinct_users,같은 계정 2회는 계정 수 1개,prior_ip_account_count_60s,1,1,True
+distinct_users,같은 계정 2회는 계정 수 1개,prior_ip_attempt_count_60s,2,2,True
+distinct_users,같은 계정 2회는 계정 수 1개,prior_ip_same_flight_attempt_count_60s,2,2,True
+distinct_users,같은 계정 2회는 계정 수 1개,prior_ip_same_flight_ratio_60s,1,1.0,True
+distinct_users,같은 계정 2회는 계정 수 1개,behavior_feature_version,1,1,True
+distinct_users,같은 계정 2회는 계정 수 1개,behavior_window_seconds,60,60,True

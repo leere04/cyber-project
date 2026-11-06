@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ALARM FLIGHT · 항공권 검색</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: #f5f7fb;
+            color: #182c49;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        header {
+            background: white;
+            border-bottom: 1px solid #e4e9f1;
+        }
+
+        .nav {
+            max-width: 1120px;
+            margin: auto;
+            padding: 22px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -0.6px;
+        }
+
+        .brand span { color: #2563eb; }
+
+        .demo {
+            font-size: 12px;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 7px 11px;
+            border-radius: 20px;
+        }
+
+        .hero {
+            padding: 50px 24px 72px;
+            background: #142d52;
+            color: white;
+        }
+
+        .hero > div {
+            max-width: 1072px;
+            margin: auto;
+        }
+
+        .hero p {
+            color: #c2d2e9;
+            line-height: 1.7;
+        }
+
+        .hero h1 {
+            font-size: clamp(28px, 4vw, 42px);
+            line-height: 1.3;
+            letter-spacing: -1.4px;
+            margin: 12px 0;
+        }
+
+        main {
+            max-width: 1120px;
+            margin: -32px auto 0;
+            padding: 0 24px 60px;
+        }
+
+        .search-panel {
+            position: relative;
+            background: white;
+            padding: 26px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px #142d5210;
+        }
+
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 16px;
+            align-items: end;
+        }
+
+        [hidden] { display: none !important; }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        select, button, input { font: inherit; }
+
+        select, button { border-radius: 9px; }
+
+        select {
+            width: 100%;
+            height: 48px;
+            padding: 0 12px;
+            background: white;
+            border: 1px solid #d6deea;
+            color: #182c49;
+        }
+
+        button {
+            min-height: 44px;
+            padding: 11px 19px;
+            background: #2563eb;
+            color: white;
+            border: 0;
+            cursor: pointer;
+            font-weight: 650;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        button:hover:not(:disabled) { background: #1d4ed8; }
+
+        .secondary {
+            background: #edf2fb;
+            color: #234873;
+        }
+
+        .secondary:hover:not(:disabled) { background: #dfe9f8; }
+
+        .muted {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.7;
+        }
+
+        .heading {
+            margin: 32px 0 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        h2 {
+            font-size: 23px;
+            margin: 0;
+        }
+
+        .heading select {
+            width: 150px;
+            height: 40px;
+        }
+
+        #message {
+            margin-top: 20px;
+            line-height: 1.6;
+            color: #475569;
+        }
+
+        #message.error { color: #b42318; }
+
+        .flight {
+            display: grid;
+            grid-template-columns: 130px 1fr auto;
+            align-items: center;
+            gap: 24px;
+            background: white;
+            border: 1px solid #e0e7f0;
+            border-radius: 14px;
+            padding: 25px;
+            margin-bottom: 14px;
+        }
+
+        .flight h3 {
+            font-size: 22px;
+            margin: 0 0 8px;
+        }
+
+        .flight p { margin: 5px 0; }
+        .flight-number { font-weight: 750; }
+
+        .price {
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .right { text-align: right; }
+        .right button { margin-top: 12px; }
+
+        .special {
+            display: inline-block;
+            margin-top: 8px;
+            color: #b45309;
+            background: #fff6df;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .empty {
+            padding: 48px 20px;
+            text-align: center;
+            border: 1px dashed #cbd5e1;
+            border-radius: 14px;
+            color: #64748b;
+        }
+
+        dialog {
+            width: min(480px, 92vw);
+            max-height: 88vh;
+            overflow-y: auto;
+            padding: 28px;
+            border: 0;
+            border-radius: 16px;
+            color: #182c49;
+        }
+
+        dialog::backdrop { background: #0f172a80; }
+        dialog h2 { margin-bottom: 18px; }
+        dialog p { line-height: 1.7; }
+        dialog button { margin-top: 15px; }
+
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #dfe6ef;
+        }
+
+        @media (max-width: 700px) {
+            form { grid-template-columns: 1fr; }
+
+            .flight {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .right { text-align: left; }
+
+            main {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .search-panel { padding: 20px; }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="nav">
+            <div class="brand">ALARM <span>FLIGHT</span></div>
+            <span class="demo">모의 예약 서비스</span>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div>
+            <p>여행의 시작, 항공권부터</p>
+            <h1>다음 여행은<br>어디로 떠나볼까요?</h1>
+            <p>출발지와 도착지를 선택하고 항공편을 확인하세요.</p>
+        </div>
+    </section>
+
+    <main>
+        <section class="search-panel">
+            <form id="searchForm">
+                <div>
+                    <label for="departure">출발지</label>
+                    <select id="departure">
+                        <option value="">전체 출발지</option>
+                        <option value="GMP">김포 GMP</option>
+                        <option value="ICN">인천 ICN</option>
+                        <option value="CJU">제주 CJU</option>
+                        <option value="PUS">부산 PUS</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="arrival">도착지</label>
+                    <select id="arrival">
+                        <option value="">전체 도착지</option>
+                        <option value="CJU">제주 CJU</option>
+                        <option value="PUS">부산 PUS</option>
+                        <option value="NRT">도쿄 NRT</option>
+                        <option value="GMP">김포 GMP</option>
+                        <option value="ICN">인천 ICN</option>
+                    </select>
+                </div>
+
+                <button id="searchButton" type="submit">
+                    항공편 검색
+                </button>
+            </form>
+        </section>
+
+        <div id="message" role="status" aria-live="polite">
+            항공편을 불러오는 중입니다.
+        </div>
+
+        <div class="heading">
+            <h2>검색 결과 <span id="count"></span></h2>
+
+            <select id="sort" aria-label="검색 결과 정렬">
+                <option value="departure">출발 시간순</option>
+                <option value="price">낮은 가격순</option>
+            </select>
+        </div>
+
+        <section id="flightList" aria-label="항공편 목록"></section>
+
+        <footer class="muted">
+            ALARM FLIGHT · 졸업프로젝트용 모의 항공권 서비스<br>
+            실제 항공권 발권이나 결제는 진행되지 않습니다.
+        </footer>
+    </main>
+
+    <dialog id="detailDialog" aria-labelledby="detailTitle">
+        <h2 id="detailTitle">항공편 상세</h2>
+        <div id="detailContent"></div>
+        <button id="closeDialog" class="secondary" type="button">
+            닫기
+        </button>
+    </dialog>
+
+    <script>
+        const $ = id => document.getElementById(id);
+        let flights = [];
+
+        const airportNames = {
+            GMP: "김포",
+            ICN: "인천",
+            CJU: "제주",
+            PUS: "부산",
+            NRT: "도쿄"
+        };
+
+        const airport = code =>
+            `${airportNames[code] || code} (${code})`;
+
+        const money = value =>
+            Number(value).toLocaleString("ko-KR") + "원";
+
+        function dateTime(value) {
+            if (!value) return "미정";
+            return String(value).replace("T", " ").slice(0, 16);
+        }
+
+        function element(tag, text, className = "") {
+            const node = document.createElement(tag);
+            node.textContent = text;
+            node.className = className;
+            return node;
+        }
+
+        function message(text, isError = false) {
+            $("message").textContent = text;
+            $("message").className = isError ? "error" : "";
+        }
+
+        async function get(path) {
+            const url = new URL(path, window.location.origin);
+            const userId = sessionStorage.getItem("alarmFlightUserId");
+
+            if (
+                userId &&
+                (
+                    url.pathname === "/flights" ||
+                    url.pathname.startsWith("/flights/")
+                )
+            ) {
+                url.searchParams.set("user_id", userId);
+            }
+
+            const response = await fetch(url, {
+                cache: "no-store"
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    typeof data.detail === "string"
+                        ? data.detail
+                        : "요청을 처리하지 못했습니다."
+                );
+            }
+
+            return data;
+        }
+
+        function renderFlights() {
+            const list = $("flightList");
+            list.replaceChildren();
+            $("count").textContent = `${flights.length}개`;
+
+            const sorted = [...flights].sort((a, b) => {
+                if ($("sort").value === "price") {
+                    return a.price - b.price;
+                }
+
+                return String(a.departure_time || "").localeCompare(
+                    String(b.departure_time || "")
+                );
+            });
+
+            if (sorted.length === 0) {
+                list.append(element(
+                    "div",
+                    "조건에 맞는 항공편이 없습니다.",
+                    "empty"
+                ));
+                return;
+            }
+
+            for (const flight of sorted) {
+                const card = document.createElement("article");
+                card.className = "flight";
+
+                const identity = document.createElement("div");
+
+                identity.append(
+                    element("p", flight.flight_no, "flight-number"),
+                    element("p", "ALARM FLIGHT", "muted")
+                );
+
+                if (flight.is_special) {
+                    identity.append(
+                        element("span", "특가", "special")
+                    );
+                }
+
+                const info = document.createElement("div");
+
+                info.append(
+                    element(
+                        "h3",
+                        `${airport(flight.departure_airport)} → ${airport(flight.arrival_airport)}`
+                    ),
+                    element(
+                        "p",
+                        `출발 ${dateTime(flight.departure_time)}`,
+                        "muted"
+                    ),
+                    element(
+                        "p",
+                        `도착 ${dateTime(flight.arrival_time)}`,
+                        "muted"
+                    ),
+                    element(
+                        "p",
+                        `잔여 ${flight.remaining_seats}석`,
+                        "muted"
+                    )
+                );
+
+                const price = document.createElement("div");
+                price.className = "right";
+
+                price.append(
+                    element("div", money(flight.price), "price"),
+                    element("p", "1인 기준", "muted")
+                );
+
+                const detail = element("button", "상세 보기");
+                detail.type = "button";
+
+                detail.addEventListener("click", () => {
+                    openDetail(flight.id, detail);
+                });
+
+                price.append(detail);
+                card.append(identity, info, price);
+                list.append(card);
+            }
+        }
+
+        async function searchFlights(event) {
+            if (event) event.preventDefault();
+
+            const params = new URLSearchParams();
+            const departure = $("departure").value;
+            const arrival = $("arrival").value;
+
+            if (departure) {
+                params.set("departure_airport", departure);
+            }
+
+            if (arrival) {
+                params.set("arrival_airport", arrival);
+            }
+
+            $("searchButton").disabled = true;
+            message("항공편을 검색하고 있습니다.");
+
+            try {
+                const data = await get(`/flights?${params}`);
+
+                if (!Array.isArray(data)) {
+                    throw new Error("항공편 목록의 응답 형식이 올바르지 않습니다.");
+                }
+
+                const invalidFlight = data.some(flight =>
+                    !flight ||
+                    flight.id == null ||
+                    typeof flight.departure_time !== "string" ||
+                    typeof flight.price !== "number"
+                );
+
+                if (invalidFlight) {
+                    throw new Error(
+                        "서버 응답에 항공편 정보가 누락되어 있습니다. backend/routers/flights.py의 조회 코드를 확인해 주세요."
+                    );
+                }
+
+                flights = data;
+                renderFlights();
+
+                message(
+                    flights.length
+                        ? `${flights.length}개의 항공편을 찾았습니다.`
+                        : "등록된 항공편이 없거나 검색 조건과 일치하지 않습니다."
+                );
+
+            } catch (error) {
+                message(
+                    `검색 실패: ${error.message} 이전 검색 결과가 남아 있을 수 있습니다.`,
+                    true
+                );
+
+            } finally {
+                $("searchButton").disabled = false;
+            }
+        }
+
+        async function openDetail(id, button) {
+            button.disabled = true;
+
+            try {
+                const flight = await get(`/flights/${id}`);
+                const content = $("detailContent");
+
+                content.replaceChildren();
+
+                const lines = [
+                    `${flight.flight_no} · ${airport(flight.departure_airport)} → ${airport(flight.arrival_airport)}`,
+                    `출발: ${dateTime(flight.departure_time)}`,
+                    `도착: ${dateTime(flight.arrival_time)}`,
+                    `1인 가격: ${money(flight.price)}`,
+                    `잔여 좌석: ${flight.remaining_seats}석`,
+                    `판매 시작: ${dateTime(flight.sale_open_at)}`
+                ];
+
+                for (const line of lines) {
+                    content.append(element("p", line));
+                }
+
+                if (typeof window.prepareBooking !== "function") {
+                    throw new Error(
+                        "예약 기능을 불러오지 못했습니다. 콘솔의 booking.js 오류를 확인해 주세요."
+                    );
+                }
+
+                await window.prepareBooking(flight);
+                $("detailDialog").showModal();
+
+            } catch (error) {
+                message(
+                    `상세 조회 실패: ${error.message}`,
+                    true
+                );
+
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        $("searchForm").addEventListener("submit", searchFlights);
+        $("sort").addEventListener("change", renderFlights);
+
+        $("closeDialog").addEventListener("click", () => {
+            $("detailDialog").close();
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            searchFlights();
+        });
+    </script>
+
+<script src="/frontend/app.js?v=3" defer></script>
+<script src="/frontend/booking.js?v=3" defer></script>
+<script src="/frontend/reservations.js?v=1" defer></script>
+</body>
+</html>

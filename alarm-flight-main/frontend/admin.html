@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ALARM FLIGHT · 관제</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0c1424;color:#e2e8f0;font-family:-apple-system,BlinkMacSystemFont,sans-serif}main{max-width:1440px;margin:auto;padding:28px}h1{font-size:30px;margin:8px 0}h2{font-size:21px}h3{font-size:16px}p{line-height:1.65}.muted,small{color:#a4b4cb}a{color:#93c5fd}.top,.tools,.tabs{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.top{justify-content:space-between}.brand{color:#60a5fa;font-weight:800;letter-spacing:2px}.tabs{margin:25px 0}.tabs button[aria-selected=true]{background:#2563eb;border-color:#60a5fa}button,input,select{font:inherit;border:1px solid #40516d;border-radius:8px;padding:10px 13px;background:#17243a;color:#e2e8f0}button{cursor:pointer}button:hover{border-color:#93c5fd}button:disabled{opacity:.5;cursor:wait}input[type=checkbox]{accent-color:#60a5fa}label{display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap}input[type=number]{width:120px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:20px 0}.card,.panel{background:#142036;border:1px solid #2e405c;border-radius:12px;padding:20px}.card strong{display:block;font-size:30px;margin-top:10px}.card span{color:#a4b4cb;font-size:14px}.panel{margin:16px 0}.table-wrap{overflow:auto;border:1px solid #2e405c;border-radius:10px;margin-top:15px}table{width:100%;border-collapse:collapse;min-width:740px;background:#142036}th,td{text-align:left;vertical-align:top;border-bottom:1px solid #2e405c;padding:13px;font-size:14px;line-height:1.6;overflow-wrap:anywhere}th{background:#1b2a43;color:#b2c2d9}td:last-child{min-width:230px}details{max-width:650px}summary{cursor:pointer;color:#93c5fd}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;max-height:360px;overflow:auto;background:#0c1424;padding:12px;border-radius:8px}.CONFIRMED,.ok{color:#6ee7b7}.BLOCKED,.error{color:#fda4af}.CAPTCHA_REQUIRED{color:#fcd34d}.CANCELLED{color:#a4b4cb}[hidden]{display:none!important}.message{min-height:24px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}.danger{border-color:#be4560}.badge{font-size:12px;padding:6px 10px;border-radius:20px;background:#263754;color:#b7c9e4}.rule{margin:12px 0;padding:14px;border-left:3px solid #60a5fa;background:#192840}.rule p{margin:5px 0}.tools{margin:14px 0}@media(max-width:600px){main{padding:16px}h1{font-size:24px}.tabs button{flex:1;padding:10px}.card{padding:14px}}
+.ai-result{min-width:180px;display:grid;gap:5px}.ai-result small{font-size:12px}.shadow-note{border-left:3px solid #60a5fa;padding:12px 16px;background:#142036;color:#b7c9e4}
+</style></head><body><main>
+<header class="top"><div><div class="brand">ALARM FLIGHT</div><h1>예약 보안 관제</h1><p class="muted">요청 시점의 판정과 현재 예약 상태를 구분해서 확인합니다.</p></div><div><span class="badge">로컬 실험용 · 관리자 인증 미구현</span><p><a href="/app">항공권 검색으로 이동 ↗</a></p></div></header>
+<nav class="tabs" aria-label="관제 메뉴"></nav>
+<div class="tools"><button id="refresh">현재 화면 새로고침</button><label><input id="auto" type="checkbox" checked>5초 자동 갱신</label></div><p id="notice" class="message muted" role="status" aria-live="polite"></p>
+<section id="overview"><h2>전체 누적 현황</h2><p class="muted">DB 전체 통계입니다. 의심 판정 비율은 탐지 정확도와 다릅니다.</p><div id="summaryCards" class="cards"></div><div class="grid"><div class="panel"><h3>예약 요청 당시 판정</h3><div id="decisions"></div></div><div class="panel"><h3>현재 예약 상태</h3><div id="statuses"></div></div></div><div class="panel"><h3>규칙별 탐지 횟수</h3><p class="muted">한 요청에서 여러 규칙이 동시에 집계될 수 있습니다.</p><div id="hits"></div></div></section>
+<section id="reservations" hidden><h2>예약 내역</h2><div class="tools"><label>상태 <select id="statusFilter"><option value="">전체</option><option value="CONFIRMED">예약 확정</option><option value="CAPTCHA_REQUIRED">추가 인증 대기</option><option value="BLOCKED">차단</option><option value="CANCELLED">취소</option></select></label></div><p class="muted">선택한 상태의 최신 100건. 상세를 펼치면 탐지 사유와 요청 정보를 확인할 수 있습니다.</p><div id="reservationTable"></div></section>
+<section id="logs" hidden><h2>행동 로그</h2><div class="tools"><label>분류 <select id="logFilter"><option value="">전체</option><option value="anomalies">의심 표시 로그</option><option>SIGNUP</option><option>COUPON_ISSUED</option><option>FLIGHT_SEARCH</option><option>FLIGHT_VIEW</option><option>RESERVATION_ATTEMPT</option><option>RESERVATION_REJECTED</option><option>CAPTCHA_PASSED</option><option>CAPTCHA_FAILED</option><option>RESERVATION_CANCELLED</option></select></label><button id="exportLogs">조회한 로그 JSON 저장</button></div><p class="muted">최신 100건. features는 탐지 시점의 특징값입니다. is_anomaly는 시스템 표시이며 실제 부정 이용의 정답 라벨이 아닙니다.</p><p class="shadow-note">AI 관찰 모드(shadow): 예측은 참고용으로 기록하며 현재 예약 판정에는 반영하지 않습니다. 모델 점수(0~1)는 실제 부정 이용 확률이 아닙니다. 기록 없음은 정상 예측을 뜻하지 않습니다.</p><div id="logTable"></div></section>
+<section id="rules" hidden><h2>탐지 규칙과 판정 기준</h2><p class="muted">백엔드의 현재 설정을 조회합니다. 이 화면에서는 설정을 변경하지 않습니다.</p><div id="ruleMeta" class="panel"></div><div id="ruleList"></div></section>
+<section id="members" hidden><h2>회원별 조사</h2><form id="memberForm" class="tools"><label>회원 번호 <input id="memberId" type="number" min="1" step="1" required></label><button type="submit">회원 조회</button></form><p id="memberNotice" role="status"></p><div id="memberInfo"></div><button id="toggleBlock" class="danger" hidden></button><h3>해당 회원 행동 기록</h3><div id="memberLogs"></div></section>
+<section id="demo" hidden><h2>시나리오 실행</h2><p class="muted">실행하면 모의 회원·예약·로그가 추가됩니다. 승인된 예약은 좌석과 쿠폰을 사용합니다. 시나리오의 IP는 서버 내부에서 생성하는 실험값입니다.</p><div class="grid"><div class="panel"><h3>정상 예약</h3><p>계정 한 개가 가입 쿠폰으로 일반 항공편을 예약합니다.</p><button data-scenario="normal">정상 시나리오 실행</button></div><div class="panel"><h3>공유 기기 · 추가 인증</h3><p>같은 기기의 두 번째 계정이 쿠폰 없이 예약합니다. 예상 판정은 추가 인증입니다.</p><button data-scenario="suspicious">의심 시나리오 실행</button></div><div class="panel"><h3>다계정 · 오픈 직후 예약</h3><p>계정 네 개가 같은 IP·기기에서 특가 항공편 예약을 요청합니다.</p><button data-scenario="bot">봇 시나리오 실행</button></div></div><p id="demoNotice" role="status"></p><div id="demoResult"></div><button id="exportDemo" hidden>시연 결과 JSON 저장</button><p class="muted">예상 판정과 실제 판정은 다를 수 있습니다. 실행 결과를 표시하며, 자동으로 성공 처리하지 않습니다. DEMO_MODE=0이면 시연 API를 사용할 수 없습니다.</p></section>
+
+<section id="experiments" hidden>
+<h2>실험 결과</h2><p class="muted">격리된 실험에서 저장한 results.json 또는 summary.json을 선택하세요. 파일은 이 브라우저에서만 읽으며 서버에 업로드하지 않습니다.</p>
+<div class="panel"><label>결과 JSON 파일 <input id="experimentFile" type="file" accept=".json,application/json"></label><p id="experimentNotice" role="status" aria-live="polite">아직 선택한 파일이 없습니다.</p></div>
+<p class="muted">지원: 머신러닝 평가 / 시나리오 수집 요약 / 추가 확인 정책 비교 / 쿠폰 규칙 비교 / 행동 정보 계산 검사. 검사 통과율은 실제 탐지 정확도·오탐률·AI 성능을 의미하지 않습니다. 새로고침하면 파일을 다시 선택해야 합니다.</p>
+<div id="experimentCards" class="cards"></div><div id="experimentMeta"></div><div id="experimentTable"></div>
+</section>
+</main><script>
+'use strict';
+const $=id=>document.getElementById(id);
+const names={CONFIRMED:'예약 확정',CAPTCHA_REQUIRED:'추가 인증 대기',BLOCKED:'차단',CANCELLED:'취소'};
+const tabs={overview:'전체 통계',reservations:'예약 내역',logs:'행동 로그',rules:'탐지 규칙',members:'회원 조사',demo:'시나리오',experiments:'실험 결과'};
+let active='overview',version=0,loading=false,mutation=false,member=null,logData=null,demoData=null;
+function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=String(text);if(cls)n.className=cls;return n;}
+function time(v){return v?String(v).replace('T',' ').slice(0,19):'—';}
+function score(v){return v==null?'미산출':String(v);}
+function status(v){return el('span',names[v]||v||'—',Object.hasOwn(names,v)?v:'');}
+async function api(path,options={}){const c=new AbortController(),t=setTimeout(()=>c.abort(),15000);try{const r=await fetch(path,{cache:'no-store',...options,signal:c.signal});let data;try{data=await r.json();}catch{throw Error('서버 응답이 JSON 형식이 아닙니다.');}if(!r.ok)throw Error(typeof data.detail==='string'?data.detail:JSON.stringify(data.detail||`HTTP ${r.status}`));return data;}finally{clearTimeout(t);}}
+function table(target,headers,rows){const wrap=el('div',undefined,'table-wrap'),t=el('table'),head=el('thead'),tr=el('tr'),body=el('tbody');headers.forEach(x=>tr.append(el('th',x)));head.append(tr);if(!rows.length){const r=el('tr'),d=el('td','표시할 기록이 없습니다.');d.colSpan=headers.length;r.append(d);body.append(r);}for(const cells of rows){const r=el('tr');for(const value of cells){const d=el('td');if(value instanceof Node)d.append(value);else d.textContent=value==null?'—':String(value);r.append(d);}body.append(r);}t.append(head,body);wrap.append(t);$(target).replaceChildren(wrap);}
+function details(data,reasons=[]){const d=el('details');d.append(el('summary',reasons.length?`탐지 사유 ${reasons.length}개 · 상세`:'상세 정보'));for(const reason of reasons)d.append(el('p',reason));d.append(el('pre',JSON.stringify(data,null,2)));return d;}
+function list(target,data){$(target).replaceChildren(...Object.entries(data).map(([k,v])=>el('p',`${names[k]||k}: ${v}`)));}
+function aiObservation(log){
+ if(!log.message)return null;
+ try{
+  const parsed=typeof log.message==='string'?JSON.parse(log.message):log.message;
+  const obs=parsed?.ai_observation;
+  return obs && typeof obs==='object' && !Array.isArray(obs)?obs:null;
+ }catch{return null;}
+}
+function aiCell(log){
+ const box=el('div',undefined,'ai-result'),obs=aiObservation(log);
+ if(!obs){box.append(el('span','기록 없음','muted'));return box;}
+ if(obs.status!=='ok'){
+  box.append(el('strong','AI 산출 실패','CAPTCHA_REQUIRED'),el('small',obs.reason||'상태 확인 필요'));
+  return box;
+ }
+ const value=obs.score;
+ if(typeof value!=='number'||!Number.isFinite(value)||value<0||value>1||!['normal','abuse'].includes(obs.prediction)){
+  box.append(el('strong','AI 기록 형식 확인 필요','CAPTCHA_REQUIRED'));return box;
+ }
+ box.append(el('strong',obs.prediction==='abuse'?'남용 예측':'정상 예측',obs.prediction==='abuse'?'BLOCKED':'CONFIRMED'));
+ box.append(el('span',`모델 점수 ${value.toFixed(4)} / 1`));
+ box.append(el('small',obs.mode==='shadow'?'관찰 모드 · 판정 미반영':'모드 확인 필요'));
+ return box;
+}
+function renderLogs(target,data){
+ if(!Array.isArray(data))throw Error('로그 목록 응답 형식 오류');
+ table(target,['시각 / 번호','회원 / 예약','행동','최초 판정','규칙 점수','최종 위험 점수','AI 예측 (참고)','근거 및 특징값'],data.map(x=>[
+  `${time(x.timestamp)} · #${x.id}`,`${x.user_id??'—'} / ${x.reservation_id??'—'}`,x.action,status(x.decision),score(x.rule_score),score(x.risk_score),aiCell(x),
+  details({ip:x.ip,device_id:x.device_id,rule_score:x.rule_score,ai_score:x.ai_score,is_anomaly:x.is_anomaly,ai_observation:aiObservation(x),message:x.message,features:x.features},x.reasons||[])
+ ]));
+}
+async function load(){if(loading||mutation)return;if(active==='experiments'){$('notice').textContent='저장된 실험 결과를 파일로 불러오는 화면입니다. 자동 갱신하지 않습니다.';return;}if(['members','demo'].includes(active)){$('notice').textContent='조회 또는 실행 버튼을 눌러 주세요.';$('notice').className='message muted';return;}const tab=active,token=version;loading=true;$('refresh').disabled=true;$('notice').textContent='불러오는 중입니다. 기존 표시가 있다면 이전 조회 결과입니다.';try{let data;
+if(tab==='overview'){data=await api('/stats');if(token!==version)return;const d=data.detection;const items=[['전체 회원',data.total_users],['차단 회원',data.blocked_users],['탐지 수행 요청',d.total_attempts],['의심 판정 비율',`${d.anomaly_rate}%`],['검증 단계 거절',d.rejected_requests],['평균 위험 점수',d.avg_risk_score]];$('summaryCards').replaceChildren(...items.map(([k,v])=>{const c=el('div',undefined,'card');c.append(el('span',k),el('strong',v));return c;}));list('decisions',d.by_decision);list('statuses',data.reservations.by_status);list('hits',d.rule_hits);}
+else if(tab==='reservations'){const p=new URLSearchParams({limit:'100'});if($('statusFilter').value)p.set('status',$('statusFilter').value);data=await api('/reservations?'+p);if(token!==version)return;if(!Array.isArray(data))throw Error('예약 목록 응답 형식 오류');table('reservationTable',['예약 / 회원','요청 시각','항공편','현재 상태','규칙 / 위험','상세'],data.map(x=>[`#${x.id} / #${x.user_id}`,time(x.created_at),x.flight_id,status(x.status),`${score(x.rule_score)} / ${score(x.risk_score)}`,details({seat_count:x.seat_count,total_price:x.total_price,coupon_id:x.coupon_id,ip:x.request_ip,device_id:x.device_id,ai_score:x.ai_score,captcha_question:x.captcha_question},x.reasons||[])]));}
+else if(tab==='logs'){const f=$('logFilter').value;data=await api(f==='anomalies'?'/logs/anomalies?limit=100':'/logs?'+new URLSearchParams({limit:'100',...(f?{action:f}:{})}));if(token!==version)return;renderLogs('logTable',data);logData={filter:f,fetched_at:new Date().toISOString(),logs:data};}
+else if(tab==='rules'){data=await api('/rules');if(token!==version)return;const {captcha,block}=data.thresholds;$('ruleMeta').replaceChildren(el('p',`위험 점수 ${captcha}점 미만: 승인 / ${captcha}점 이상 ${block}점 미만: 추가 인증 / ${block}점 이상: 차단`),el('p',`설정 가중치 — 규칙 ${data.weights.rule}, AI ${data.weights.ai}`),el('p','AI 점수가 없으면 규칙 점수만 사용합니다. 규칙 점수는 합산하며 위험 점수는 최대 100점입니다.'));$('ruleList').replaceChildren(...Object.entries(data.rules).map(([code,r])=>{const c=el('article',undefined,'rule');c.append(el('h3',`${code} · ${r.enabled?'활성':'비활성'} · +${r.score}점`),el('p',r.description),el('pre',JSON.stringify(r,null,2)));return c;}));}
+else return;
+$('notice').textContent=`마지막 조회: ${new Date().toLocaleTimeString('ko-KR')}`;$('notice').className='message muted';
+}catch(e){if(token===version){$('notice').textContent=`조회 실패: ${e.name==='AbortError'?'응답 시간 초과':e.message}. 기존 표시가 있다면 이전 정보입니다.`;$('notice').className='message error';}}finally{loading=false;$('refresh').disabled=mutation;if(token!==version)load();}}
+for(const [key,label]of Object.entries(tabs)){const b=el('button',label);b.type='button';b.dataset.tab=key;b.setAttribute('aria-selected',String(key===active));b.onclick=()=>{if(mutation)return;active=key;version++;for(const k of Object.keys(tabs))$(k).hidden=k!==key;document.querySelectorAll('[data-tab]').forEach(n=>n.setAttribute('aria-selected',String(n.dataset.tab===key)));$('notice').textContent=['members','demo'].includes(key)?'조회 또는 실행 버튼을 눌러 주세요.':'';load();};document.querySelector('.tabs').append(b);}
+function lock(value){mutation=value;document.querySelectorAll('button').forEach(b=>b.disabled=value);$('refresh').disabled=value||loading;}
+$('refresh').onclick=()=>active==='members'&&member?lookupMember():load();
+for(const id of ['statusFilter','logFilter'])$(id).onchange=()=>{version++;load();};
+setInterval(()=>{if($('auto').checked&&!document.hidden&&!['members','demo','experiments'].includes(active)&&!document.querySelector('details[open]'))load();},5000);
+function download(data,name){const u=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=el('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000);}
+$('exportLogs').onclick=()=>{if(logData)download(logData,'alarm-flight-logs.json');else $('notice').textContent='로그를 먼저 조회해 주세요.';};
+async function lookupMember(){if(mutation)return;const id=Number($('memberId').value);if(!Number.isInteger(id)||id<1){$('memberNotice').textContent='1 이상의 회원 번호를 입력해 주세요.';return;}lock(true);member=null;$('toggleBlock').hidden=true;$('memberInfo').replaceChildren();$('memberLogs').replaceChildren();$('memberNotice').textContent='회원을 조회하고 있습니다.';try{const u=await api(`/users/${id}`);member=u;$('memberInfo').replaceChildren(el('p',`${u.name} · ${u.email} · 회원 #${u.id}`),el('p',`회원 상태: ${u.is_blocked?'차단됨':'차단되지 않음'} / 가입: ${time(u.created_at)}`));$('toggleBlock').hidden=false;$('toggleBlock').textContent=u.is_blocked?'회원 차단 해제':'회원 차단';try{renderLogs('memberLogs',await api(`/logs/user/${id}`));$('memberNotice').textContent='회원과 활동 기록을 조회했습니다.';}catch(e){$('memberNotice').textContent=`회원 조회 완료, 로그 조회 실패: ${e.message}`;}}catch(e){$('memberNotice').textContent=`조회 실패: ${e.message}`;}finally{lock(false);}}
+$('memberForm').onsubmit=e=>{e.preventDefault();lookupMember();};
+$('toggleBlock').onclick=async()=>{if(!member||mutation)return;const id=member.id,blocked=!member.is_blocked;if(!confirm(`회원 #${id}를 ${blocked?'차단':'차단 해제'}할까요?\n회원 차단은 기존 예약 취소와 별개입니다.`))return;lock(true);try{await api(`/users/${id}/block?blocked=${blocked}`,{method:'POST'});$('memberId').value=id;lock(false);await lookupMember();}catch(e){$('memberNotice').textContent=`처리 결과 확인 필요: ${e.message}. 다시 조회해 현재 상태를 확인해 주세요.`;}finally{lock(false);}};
+document.querySelectorAll('[data-scenario]').forEach(b=>b.onclick=async()=>{if(mutation)return;const scenario=b.dataset.scenario;if(!confirm(`${b.textContent}할까요?\n모의 회원·예약·로그가 추가되며 승인 시 좌석이 차감됩니다.`))return;lock(true);demoData=null;$('exportDemo').hidden=true;$('demoResult').replaceChildren();$('demoNotice').textContent='시나리오 실행 중입니다.';try{const data=await api(`/demo/scenarios/${scenario}`,{method:'POST'});if(!Array.isArray(data.steps))throw Error('시연 응답 형식 오류');demoData={executed_at:new Date().toISOString(),...data};table('demoResult',['단계','회원 / 예약','실제 판정','위험 점수','근거'],data.steps.map(s=>[s.step,`${s.user_id} / ${s.reservation_id}`,status(s.decision),s.risk_score,details({captcha_question:s.captcha_question,hint:s.hint},s.reasons||[])]));$('demoNotice').textContent=`실행 완료 · ${data.steps.length}개 결과. 이 시연은 탐지 정확도 평가가 아닙니다.`;$('exportDemo').hidden=false;}catch(e){$('demoNotice').textContent=`실행 결과 확인 필요: ${e.message}. 404라면 시연 API 활성화를 확인하세요. 통신 오류여도 일부 기록은 생성됐을 수 있으니 예약·로그를 확인한 뒤 재실행하세요.`;}finally{lock(false);}});
+$('exportDemo').onclick=()=>{if(demoData)download(demoData,'alarm-flight-scenario.json');};
+
+function validateExperiment(data){
+ const obj=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
+ const num=v=>typeof v==='number'&&Number.isFinite(v);
+ const decisions=new Set(['CONFIRMED','CAPTCHA_REQUIRED','BLOCKED']);
+ if(!obj(data)||!Array.isArray(data.results)||!data.results.length||data.results.length>1000)throw Error('1~1000개 results 항목이 있는 결과 파일을 선택해 주세요.');
+ if(typeof data.all_checks_passed!=='boolean')throw Error('전체 검사 결과가 없는 파일입니다.');
+ const rows=data.results;
+ if(!rows.every(r=>obj(r)&&typeof r.passed==='boolean'&&typeof r.scenario==='string'&&typeof r.description==='string'))throw Error('사례별 검사 결과 형식이 올바르지 않습니다.');
+ const coupon=rows.every(r=>num(r.before_score)&&num(r.after_score)&&decisions.has(r.before_decision)&&decisions.has(r.after_decision)&&['none','signup','event'].includes(r.coupon_type)&&Array.isArray(r.before_hits)&&Array.isArray(r.after_hits));
+ const behavior=rows.every(r=>obj(r.expected)&&obj(r.actual)&&Object.keys(r.expected).length>0);
+ if(!coupon&&!behavior)throw Error('지원하지 않는 결과입니다. coupon_comparison 또는 behavior_validation 폴더의 results.json을 선택해 주세요.');
+ if(behavior&&!coupon&&rows.some(r=>r.passed!==Object.keys(r.expected).every(k=>Object.hasOwn(r.actual,k)&&r.actual[k]===r.expected[k])))throw Error('기대값·실제값과 사례 통과 표시가 일치하지 않습니다.');
+ const passed=rows.filter(r=>r.passed).length;
+ if(data.all_checks_passed!==(passed===rows.length))throw Error('전체 검사 표시와 사례별 결과가 일치하지 않습니다.');
+ return {kind:coupon?'coupon':'behavior',rows,passed};
+}
+function verdict(ok){return el('span',ok?'PASS · 검사 통과':'FAIL · 차이 발견',ok?'ok':'error');}
+function renderExperiment(data,fileName){
+ if(data && data.experiment_type==='ml_baseline_v1')return renderML(data,fileName);
+ if(data && Object.hasOwn(data,"request_count"))return renderSummary(data,fileName);
+ const {kind,rows,passed}=validateExperiment(data);
+ const cards=[['실험 유형',kind==='coupon'?'쿠폰 규칙 비교':'행동 정보 계산'],['검사 사례',rows.length],['통과 사례',passed],['차이 발견',rows.length-passed]];
+ $('experimentCards').replaceChildren(...cards.map(([k,v])=>{const c=el('div',undefined,'card');c.append(el('span',k),el('strong',v));return c;}));
+ $('experimentMeta').replaceChildren(el('h3','실험 범위와 설정'),el('p',data.scope||'실험 범위 설명 없음'),details({file:fileName,rule_engine_sha256:data.rule_engine_sha256,thresholds:data.thresholds,baseline_method:data.baseline_method,rules:data.rules}));
+ if(kind==='coupon'){
+ const couponNames={none:'쿠폰 미사용',signup:'가입 쿠폰',event:'일반 쿠폰'};
+ table('experimentTable',['시나리오 / 현재 쿠폰','규칙 점수 변경','변경 전 판정','변경 후 판정','조건 검사','상세'],rows.map(r=>[r.description+' / '+couponNames[r.coupon_type],`${r.before_score} → ${r.after_score}`,status(r.before_decision),status(r.after_decision),verdict(r.passed),details({scenario:r.scenario,before_hits:r.before_hits,after_hits:r.after_hits,features:r.features})]));
+ }else{
+ table('experimentTable',['시나리오','계산 검사','항목별 기대값과 실제값'],rows.map(r=>{const box=el('details');box.append(el('summary','기대값 / 실제값 보기'));for(const [k,v]of Object.entries(r.expected))box.append(el('p',`${k}: ${JSON.stringify(v)} / ${JSON.stringify(r.actual[k])}`));return [r.description,verdict(r.passed),box];}));
+ }
+ $('experimentNotice').textContent=`${fileName} · ${passed}/${rows.length} 사례 통과. 저장된 결과를 표시하며 검사를 재실행하지 않습니다.`;
+}
+let experimentReadVersion=0;
+$('experimentFile').onchange=async()=>{
+ const token=++experimentReadVersion,file=$('experimentFile').files[0];
+ for(const id of ['experimentCards','experimentMeta','experimentTable'])$(id).replaceChildren();
+ $('experimentNotice').className='';
+ if(!file){$('experimentNotice').textContent='아직 선택한 파일이 없습니다.';return;}
+ $('experimentNotice').textContent='파일을 읽는 중입니다.';
+ try{
+ if(file.size>5*1024*1024)throw Error('파일 크기는 5MB 이하여야 합니다.');
+ const raw=await file.text();if(token!==experimentReadVersion)return;
+ const data=JSON.parse(raw.replace(/^\uFEFF/,''));renderExperiment(data,file.name);
+ }catch(e){if(token!==experimentReadVersion)return;for(const id of ['experimentCards','experimentMeta','experimentTable'])$(id).replaceChildren();$('experimentNotice').textContent='불러오기 실패: '+e.message;$('experimentNotice').className='error';}
+};
+
+// 저장된 실험 요약만 표시합니다. 서버 판정이나 DB를 변경하지 않습니다.
+const summaryDecisions=['CONFIRMED','CAPTCHA_REQUIRED','BLOCKED','REVIEW_REQUIRED'];
+const scenarioTitles={independent:'서로 다른 IP·기기',family_ip:'가족 · 같은 IP, 다른 기기',shared_device:'공유 기기 · 쿠폰 없음',allowed_automation:'허용된 자동 예약',family_coupon:'가족 · 각자의 가입 쿠폰',coupon_abuse:'한 사람 · 다계정 가입 혜택'};
+function validateSummary(data){
+ const obj=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
+ const integer=v=>Number.isSafeInteger(v)&&v>=0;
+ const fail=()=>{throw Error('요약 파일의 항목 또는 합계가 올바르지 않습니다. 원본 summary.json을 선택해 주세요.');};
+ const counts=(v,review=false)=>{
+  if(!obj(v)||Object.keys(v).some(k=>!(review?summaryDecisions:summaryDecisions.slice(0,3)).includes(k))||!Object.values(v).every(integer))fail();
+  return Object.values(v).reduce((a,b)=>a+b,0);
+ };
+ const equal=(a,b)=>summaryDecisions.every(k=>(a[k]||0)===(b[k]||0));
+ const aggregate=(rows,key)=>{const out={};for(const r of rows)for(const [k,v]of Object.entries(r[key]))out[k]=(out[k]||0)+v;return out;};
+ if(!obj(data)||!integer(data.request_count)||data.request_count<1||typeof data.scope!=='string'||!Array.isArray(data.notes)||!data.notes.every(x=>typeof x==='string'))fail();
+ if(Array.isArray(data.groups)){
+  if(data.schema_version!==1||!data.groups.length||data.groups.length>10000||!Array.isArray(data.scenarios)||!data.scenarios.length||data.scenarios.length>100||typeof data.resource_checks_passed!=='boolean')fail();
+  const codes=new Set();
+  for(const s of data.scenarios){if(!obj(s)||typeof s.code!=='string'||typeof s.description!=='string'||codes.has(s.code))fail();codes.add(s.code);}
+  if(data.scenario_count!==codes.size||!integer(data.repeats)||data.repeats<1)fail();
+  const ids=new Set();
+  for(const g of data.groups){if(!obj(g)||typeof g.run_id!=='string'||ids.has(g.run_id)||!codes.has(g.scenario))fail();ids.add(g.run_id);counts(g.decisions);}
+  if(data.scenarios.some(s=>data.groups.filter(g=>g.scenario===s.code).length!==data.repeats))fail();
+  if(counts(data.decision_counts)!==data.request_count||!equal(aggregate(data.groups,'decisions'),data.decision_counts))fail();
+  if(!obj(data.label_counts)||Object.keys(data.label_counts).some(k=>!['normal','abuse'].includes(k))||!Object.values(data.label_counts).every(integer)||Object.values(data.label_counts).reduce((a,b)=>a+b,0)!==data.request_count)fail();
+  return {kind:'dataset',rows:data.scenarios.map(s=>({name:s.description,counts:aggregate(data.groups.filter(g=>g.scenario===s.code),'decisions')}))};
+ }
+ if(!Array.isArray(data.results)||data.results.length!==2||!Array.isArray(data.scenarios)||!data.scenarios.length||data.scenarios.length>100||typeof data.policy!=='string')fail();
+ const labels=new Set();
+ for(const r of data.results){
+  if(!obj(r)||!['normal','abuse'].includes(r.label)||labels.has(r.label)||!integer(r.count))fail();labels.add(r.label);
+  if(counts(r.before)!==r.count||counts(r.after,true)!==r.count)fail();
+ }
+ if(data.results.reduce((n,r)=>n+r.count,0)!==data.request_count)fail();
+ const codes=new Set();
+ for(const s of data.scenarios){if(!obj(s)||typeof s.scenario!=='string'||codes.has(s.scenario))fail();codes.add(s.scenario);if(counts(s.before)!==counts(s.after,true))fail();}
+ if(!equal(aggregate(data.scenarios,'before'),aggregate(data.results,'before'))||!equal(aggregate(data.scenarios,'after'),aggregate(data.results,'after')))fail();
+ return {kind:'review',rows:data.results};
+}
+function renderSummary(data,fileName){
+ const model=validateSummary(data);
+ const cards=model.kind==='dataset'
+  ? [['수집 요청',data.request_count],['예약 확정',data.decision_counts.CONFIRMED||0],['추가 인증',data.decision_counts.CAPTCHA_REQUIRED||0],['차단',data.decision_counts.BLOCKED||0]]
+  : [['비교 요청',data.request_count],['정상으로 설정',model.rows.find(r=>r.label==='normal').count],['남용으로 설정',model.rows.find(r=>r.label==='abuse').count],['비교 방식','오프라인']];
+ $('experimentCards').replaceChildren(...cards.map(([k,v])=>{const c=el('div',undefined,'card');c.append(el('span',k),el('strong',v));return c;}));
+ const meta=$('experimentMeta');
+ meta.replaceChildren(el('h3',model.kind==='dataset'?'합성 시나리오 수집 결과':'추가 확인 정책 · 가상 비교'),el('p',data.scope));
+ if(model.kind==='dataset'){
+  meta.append(el('p',`좌석·쿠폰 검사: ${data.resource_checks_passed?'PASS':'FAIL'} (파일에 저장된 결과). 탐지 정확도를 뜻하지 않습니다.`,data.resource_checks_passed?'ok':'error'));
+  meta.append(el('p',`시나리오 ${data.scenario_count}개 × ${data.repeats}회 반복. 정상 라벨 ${data.label_counts.normal||0}건 / 남용 라벨 ${data.label_counts.abuse||0}건. 라벨은 실험 설계의 가정입니다.`));
+  table('experimentTable',['시나리오','요청 수','예약 확정','추가 인증','차단'],model.rows.map(r=>[r.name,Object.values(r.counts).reduce((a,b)=>a+b,0),r.counts.CONFIRMED||0,r.counts.CAPTCHA_REQUIRED||0,r.counts.BLOCKED||0]));
+ }else{
+  meta.append(el('p','추가 확인 대기는 아직 구현하지 않은 절차를 뜻합니다. 예약 승인이나 남용 방지 성공으로 집계하지 않습니다.','CAPTCHA_REQUIRED'),el('p',data.policy));
+  const normal=model.rows.find(r=>r.label==='normal'),abuse=model.rows.find(r=>r.label==='abuse');
+  meta.append(el('p',`정상 요청 즉시 차단: ${normal.before.BLOCKED||0} → ${normal.after.BLOCKED||0}건. 남용 요청 즉시 차단: ${abuse.before.BLOCKED||0} → ${abuse.after.BLOCKED||0}건. 추가 확인 이후의 최종 결과는 평가하지 않았습니다.`));
+  const headers=['구분','요청 수','예약 확정 · 전 → 후','추가 인증 · 전 → 후','차단 · 전 → 후','추가 확인 대기 · 전 → 후'];
+  const cells=(name,r)=>[name,Object.values(r.before).reduce((a,b)=>a+b,0),...summaryDecisions.map(k=>`${r.before[k]||0} → ${r.after[k]||0}`)];
+  table('experimentTable',headers,model.rows.map(r=>cells(r.label==='normal'?'정상으로 설정':'남용으로 설정',r)));
+  const sub=el('div');sub.id='policyScenarioTable';$('experimentTable').append(el('h3','시나리오별 정책 비교'),sub);
+  table('policyScenarioTable',headers,data.scenarios.map(r=>cells(scenarioTitles[r.scenario]||r.scenario,r)));
+ }
+ const notes=el('details');notes.append(el('summary','실험 해석 시 주의사항'));for(const note of data.notes)notes.append(el('p',note));meta.append(notes,details({file:fileName,source:data.source,seed:data.seed,thresholds:data.thresholds,source_hashes:data.source_hashes,rules:data.rules}));
+ $('experimentNotice').textContent=`${fileName} · ${data.request_count}건 ${model.kind==='dataset'?'시나리오 수집':'정책 비교'} 요약. 저장된 파일을 표시하며 실험을 다시 실행하지 않습니다.`;
+}
+
+const mlMethods={all_normal:'모두 정상으로 예측',rule_block_only:'기존 규칙 · 차단만 남용으로 간주',rule_any_intervention:'기존 규칙 · 인증·차단을 남용으로 간주',decision_tree:'ML · 의사결정나무'};
+function validateML(data){
+ const obj=v=>v!==null&&typeof v==='object'&&!Array.isArray(v);
+ const int=v=>Number.isSafeInteger(v)&&v>=0;
+ const fail=message=>{throw Error('ML 결과 파일 오류: '+message);};
+ if(!obj(data)||data.experiment_type!=='ml_baseline_v1')fail('지원하지 않는 형식');
+ if(!['request_count','train_count','test_count'].every(k=>int(data[k])&&data[k]>0)||data.train_count+data.test_count!==data.request_count)fail('학습·평가 건수 불일치');
+ for(const key of ['train_groups','test_groups'])if(!Array.isArray(data[key])||!data[key].length||data[key].length>10000||!data[key].every(g=>typeof g==='string'&&g.length>0)||new Set(data[key]).size!==data[key].length)fail('그룹 목록 오류');
+ if(data.group_overlap!==false||data.train_groups.some(g=>data.test_groups.includes(g)))fail('학습·평가 그룹이 겹치거나 분리 확인이 없습니다');
+ for(const [key,total]of [['train_labels',data.train_count],['test_labels',data.test_count]]){
+  const labels=data[key];if(!obj(labels)||!int(labels.normal)||!int(labels.abuse)||labels.normal+labels.abuse!==total)fail('라벨 건수 불일치');
+ }
+ if(!Array.isArray(data.features)||!data.features.length||data.features.length>200||!data.features.every(f=>typeof f==='string')||!Array.isArray(data.notes)||!data.notes.every(n=>typeof n==='string')||typeof data.scope!=='string')fail('설명 또는 특징 목록 오류');
+ if(!obj(data.comparisons))fail('비교 결과 없음');
+ const rows=[];
+ for(const [key,title]of Object.entries(mlMethods)){
+  const m=data.comparisons[key];
+  if(!obj(m)||!['tn','fp','fn','tp'].every(k=>int(m[k])))fail(title+' 건수 오류');
+  if(m.tn+m.fp!==data.test_labels.normal||m.fn+m.tp!==data.test_labels.abuse)fail(title+' 평가 라벨과 건수 불일치');
+  const divide=(a,b)=>b?a/b:null;
+  const calculated={accuracy:divide(m.tn+m.tp,data.test_count),precision:divide(m.tp,m.tp+m.fp),recall:divide(m.tp,m.tp+m.fn),false_positive_rate:divide(m.fp,m.tn+m.fp),f1:divide(2*m.tp,2*m.tp+m.fp+m.fn)};
+  for(const [metric,value]of Object.entries(calculated)){
+   if(value===null?m[metric]!==null:typeof m[metric]!=='number'||!Number.isFinite(m[metric])||Math.abs(m[metric]-value)>1e-9)fail(title+' '+metric+' 계산 불일치');
+  }
+  rows.push({key,title,...m});
+ }
+ return rows;
+}
+function renderML(data,fileName){
+ const rows=validateML(data),percent=v=>v===null?'계산 불가':(v*100).toFixed(1)+'%';
+ const cards=[['학습 요청',data.train_count],['평가 요청',data.test_count],['평가 정상 라벨',data.test_labels.normal],['평가 남용 라벨',data.test_labels.abuse]];
+ $('experimentCards').replaceChildren(...cards.map(([k,v])=>{const c=el('div',undefined,'card');c.append(el('span',k),el('strong',v));return c;}));
+ const meta=$('experimentMeta');
+ meta.replaceChildren(el('h3','머신러닝 기준 모델 · 저장된 평가 결과'),el('p',data.scope),el('p',`학습 ${data.train_groups.length}개 그룹 / 평가 ${data.test_groups.length}개 그룹 · 겹침 없음. 같은 생성 방식의 합성 데이터이며 새로운 공격 방식에 대한 검증은 아닙니다.`));
+ const rule=data.comparisons.rule_block_only,ml=data.comparisons.decision_tree;
+ meta.append(el('p',`동일한 평가 ${data.test_count}건에서 기존 규칙(차단 기준) → ML: 정상 오탐 ${rule.fp} → ${ml.fp}건, 남용 놓침 ${rule.fn} → ${ml.fn}건.`));
+ meta.append(el('p','이 화면은 저장된 오프라인 평가 결과입니다. 서버 AI의 실행 여부는 행동 로그의 AI 예측 열에서 확인하세요. 관찰 모드(shadow)의 예측은 예약 판정에 반영하지 않습니다.','CAPTCHA_REQUIRED'));
+ const explain=el('details');explain.append(el('summary','지표 읽는 방법'),el('p','정상 오탐(FP): 정상 라벨인데 남용으로 예측. 남용 놓침(FN): 남용 라벨인데 정상으로 예측.'),el('p','정밀도: 남용이라고 예측한 요청 중 남용 라벨의 비율. 재현율: 남용 라벨 중 남용으로 예측한 비율. 정상 오탐률의 분모는 정상 라벨 요청 수입니다.'),el('p','모두 정상으로 예측해도 정상 라벨이 많으면 정확도가 높습니다. 정확도만으로 방법을 비교하지 마세요. 남용으로 예측한 요청이 없을 때 정밀도는 계산 불가로 표시합니다.'));
+ meta.append(explain);
+ const notes=el('details');notes.append(el('summary','실험 범위와 한계'));for(const n of data.notes)notes.append(el('p',n));meta.append(notes);
+ meta.append(details({file:fileName,source:data.source,source_sha256:data.source_sha256,script_sha256:data.script_sha256,python_version:data.python_version,sklearn_version:data.sklearn_version,model_parameters:data.model_parameters,features:data.features,preprocessing:data.preprocessing,train_groups:data.train_groups,test_groups:data.test_groups,train_labels:data.train_labels,test_labels:data.test_labels,conflicting_feature_patterns:data.conflicting_feature_patterns,metric_definition:data.metric_definition}));
+ table('experimentTable',['방법','정상 오탐 FP','남용 놓침 FN','정밀도','재현율','정상 오탐률','F1','정확도'],rows.map(r=>[r.title,r.fp,r.fn,percent(r.precision),percent(r.recall),percent(r.false_positive_rate),r.f1===null?'계산 불가':r.f1.toFixed(3),percent(r.accuracy)]));
+ const matrix=el('div');matrix.id='mlConfusionTable';$('experimentTable').append(el('h3','판정별 건수 · 동일 평가 데이터'),matrix);
+ table('mlConfusionTable',['방법','정상 → 정상 TN','정상 → 남용 FP','남용 → 정상 FN','남용 → 남용 TP'],rows.map(r=>[r.title,r.tn,r.fp,r.fn,r.tp]));
+ $('experimentNotice').textContent=`${fileName} · ML 평가 ${data.test_count}건. 파일 내 합계·지표 일치 확인 완료. 모델을 다시 학습하거나 평가하지 않습니다.`;
+}
+
+load();
+</script></body></html>

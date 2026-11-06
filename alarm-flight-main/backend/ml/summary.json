@@ -1,0 +1,119 @@
+{
+  "experiment_type": "ml_baseline_v1",
+  "scope": "합성 시나리오 내부의 그룹 분리 평가. 실제 이용자 탐지 성능 또는 독립된 현실 데이터 평가가 아님.",
+  "source": "/Users/ilaeeun/Desktop/alarm-flight-main/experiments/scenario_data_20261026_170411_696794/requests.csv",
+  "source_sha256": "2c8718073daffc50492c5cd73a5b47a8b556a591345b93fb5a563e8143ac33a2",
+  "script_sha256": "2f04c6e14b4e94e085c045bfec355e7426fa3c134a5d92773c29c4454718c06e",
+  "python_version": "3.13.0",
+  "sklearn_version": "1.9.1",
+  "model_parameters": {
+    "max_depth": 3,
+    "min_samples_leaf": 5,
+    "class_weight": "balanced",
+    "random_state": 20261026
+  },
+  "features": [
+    "device_account_count",
+    "ip_account_count",
+    "seconds_since_sale_open",
+    "recent_attempt_count",
+    "signup_coupon_account_count",
+    "coupon_failure_count",
+    "account_age_minutes",
+    "seat_count",
+    "is_special_flight",
+    "uses_coupon",
+    "has_device_id",
+    "seconds_since_previous_account_attempt",
+    "prior_ip_account_count_60s",
+    "prior_ip_attempt_count_60s",
+    "prior_ip_same_flight_attempt_count_60s",
+    "prior_ip_same_flight_ratio_60s"
+  ],
+  "preprocessing": "특징별 빈 값은 0으로 채우고 별도 missing 지시값을 추가. 학습 통계 사용 없음.",
+  "request_count": 180,
+  "train_count": 126,
+  "test_count": 54,
+  "train_groups": [
+    "seed20261026-repeat000",
+    "seed20261026-repeat001",
+    "seed20261026-repeat002",
+    "seed20261026-repeat005",
+    "seed20261026-repeat006",
+    "seed20261026-repeat007",
+    "seed20261026-repeat009"
+  ],
+  "test_groups": [
+    "seed20261026-repeat003",
+    "seed20261026-repeat004",
+    "seed20261026-repeat008"
+  ],
+  "group_overlap": false,
+  "train_labels": {
+    "normal": 112,
+    "abuse": 14
+  },
+  "test_labels": {
+    "normal": 48,
+    "abuse": 6
+  },
+  "conflicting_feature_patterns": 18,
+  "comparisons": {
+    "all_normal": {
+      "tn": 48,
+      "fp": 0,
+      "fn": 6,
+      "tp": 0,
+      "accuracy": 0.8888888888888888,
+      "precision": null,
+      "recall": 0.0,
+      "false_positive_rate": 0.0,
+      "f1": 0.0
+    },
+    "rule_block_only": {
+      "tn": 39,
+      "fp": 9,
+      "fn": 0,
+      "tp": 6,
+      "accuracy": 0.8333333333333334,
+      "precision": 0.4,
+      "recall": 1.0,
+      "false_positive_rate": 0.1875,
+      "f1": 0.5714285714285714
+    },
+    "rule_any_intervention": {
+      "tn": 34,
+      "fp": 14,
+      "fn": 0,
+      "tp": 6,
+      "accuracy": 0.7407407407407407,
+      "precision": 0.3,
+      "recall": 1.0,
+      "false_positive_rate": 0.2916666666666667,
+      "f1": 0.46153846153846156
+    },
+    "decision_tree": {
+      "tn": 42,
+      "fp": 6,
+      "fn": 0,
+      "tp": 6,
+      "accuracy": 0.8888888888888888,
+      "precision": 0.5,
+      "recall": 1.0,
+      "false_positive_rate": 0.125,
+      "f1": 0.6666666666666666
+    }
+  },
+  "metric_definition": "positive=남용. 규칙 비교는 BLOCKED만 positive인 경우와 CAPTCHA_REQUIRED까지 포함한 경우를 따로 표시.",
+  "notes": [
+    "label은 사전 시나리오 가정입니다. 실제 부정 이용 확정 정보가 아닙니다.",
+    "같은 반복의 6개 시나리오는 하나의 split_group으로 묶어 학습과 평가에 섞지 않았습니다.",
+    "분리된 그룹도 동일한 생성 로직을 공유합니다. 새로운 공격 방식에 대한 일반화는 검증하지 않았습니다.",
+    "ID·시나리오·판정·점수·사유·라벨은 모델 입력에서 제외했습니다.",
+    "가족과 다계정 남용은 동일한 특징에 서로 다른 라벨이 있어 완벽하게 구별할 수 없습니다.",
+    "정확도만으로 판단하지 말고 정상 오탐(fp), 남용 놓침(fn), 정밀도와 재현율을 함께 확인하세요.",
+    "ML 결과는 정상/남용 예측입니다. 예약 승인·인증·차단의 3단계 운영 정책으로 연결하지 않았습니다.",
+    "모델은 저장만 했으며 운영 서버의 ai_score는 여전히 연결 전입니다.",
+    "평가 데이터를 보고 정책이나 파라미터를 변경하면 새로운 평가 데이터가 필요합니다."
+  ]
+}

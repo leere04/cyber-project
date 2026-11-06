@@ -1,0 +1,277 @@
+{
+  "scope": "동일 합성 이력에 대한 쿠폰 규칙 조건 변경 전후 비교. HTTP/좌석/실제 탐지 성능 평가는 아님.",
+  "baseline_method": "현재 소스의 가입 쿠폰 조건 두 줄만 제거한 메모리 복사본",
+  "rule_engine_sha256": "9040c6085d0129f6805082af9a0bc2eb50785f1f9bf2153bd9e07e658e8a7a0e",
+  "thresholds": {
+    "captcha": 40,
+    "block": 70
+  },
+  "rules": {
+    "MULTI_ACCOUNT_DEVICE": {
+      "enabled": true,
+      "score": 40,
+      "threshold": 2,
+      "window_minutes": 1440,
+      "description": "같은 기기에서 여러 계정 사용"
+    },
+    "MULTI_ACCOUNT_IP": {
+      "enabled": true,
+      "score": 30,
+      "threshold": 3,
+      "window_minutes": 1440,
+      "description": "같은 IP에서 여러 계정 사용"
+    },
+    "FAST_AFTER_OPEN": {
+      "enabled": true,
+      "score": 40,
+      "seconds": 3,
+      "description": "판매 오픈 직후 지나치게 빠른 예약"
+    },
+    "RAPID_REPEAT": {
+      "enabled": true,
+      "score": 30,
+      "threshold": 3,
+      "window_seconds": 60,
+      "description": "짧은 시간 동안 반복되는 예약 요청"
+    },
+    "COUPON_FARMING": {
+      "enabled": true,
+      "score": 30,
+      "threshold": 2,
+      "window_minutes": 1440,
+      "description": "현재 가입 쿠폰 사용 요청: 같은 IP 또는 기기의 여러 계정 가입 쿠폰 이력"
+    },
+    "COUPON_RETRY": {
+      "enabled": true,
+      "score": 20,
+      "threshold": 2,
+      "window_minutes": 60,
+      "description": "사용 불가 쿠폰으로 반복 예약 시도"
+    }
+  },
+  "all_checks_passed": true,
+  "results": [
+    {
+      "scenario": "coupon_history_only",
+      "description": "쿠폰 이력만 기준 충족",
+      "coupon_type": "none",
+      "before_score": 30,
+      "after_score": 0,
+      "before_decision": "CONFIRMED",
+      "after_decision": "CONFIRMED",
+      "before_hits": [
+        "COUPON_FARMING"
+      ],
+      "after_hits": [],
+      "features": {
+        "device_account_count": 1,
+        "ip_account_count": 1,
+        "seconds_since_sale_open": 86400.0,
+        "recent_attempt_count": 1,
+        "signup_coupon_account_count": 2,
+        "coupon_failure_count": 0,
+        "account_age_minutes": 2880.0,
+        "seat_count": 1,
+        "is_special_flight": false,
+        "uses_coupon": false,
+        "has_device_id": true,
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60,
+        "seconds_since_previous_account_attempt": null,
+        "prior_ip_account_count_60s": 0,
+        "prior_ip_attempt_count_60s": 0,
+        "prior_ip_same_flight_attempt_count_60s": 0,
+        "prior_ip_same_flight_ratio_60s": null
+      },
+      "passed": true
+    },
+    {
+      "scenario": "coupon_history_only",
+      "description": "쿠폰 이력만 기준 충족",
+      "coupon_type": "signup",
+      "before_score": 30,
+      "after_score": 30,
+      "before_decision": "CONFIRMED",
+      "after_decision": "CONFIRMED",
+      "before_hits": [
+        "COUPON_FARMING"
+      ],
+      "after_hits": [
+        "COUPON_FARMING"
+      ],
+      "features": {
+        "device_account_count": 1,
+        "ip_account_count": 1,
+        "seconds_since_sale_open": 86400.0,
+        "recent_attempt_count": 1,
+        "signup_coupon_account_count": 3,
+        "coupon_failure_count": 0,
+        "account_age_minutes": 2880.0,
+        "seat_count": 1,
+        "is_special_flight": false,
+        "uses_coupon": true,
+        "has_device_id": true,
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60,
+        "seconds_since_previous_account_attempt": null,
+        "prior_ip_account_count_60s": 0,
+        "prior_ip_attempt_count_60s": 0,
+        "prior_ip_same_flight_attempt_count_60s": 0,
+        "prior_ip_same_flight_ratio_60s": null
+      },
+      "passed": true
+    },
+    {
+      "scenario": "coupon_history_only",
+      "description": "쿠폰 이력만 기준 충족",
+      "coupon_type": "event",
+      "before_score": 30,
+      "after_score": 0,
+      "before_decision": "CONFIRMED",
+      "after_decision": "CONFIRMED",
+      "before_hits": [
+        "COUPON_FARMING"
+      ],
+      "after_hits": [],
+      "features": {
+        "device_account_count": 1,
+        "ip_account_count": 1,
+        "seconds_since_sale_open": 86400.0,
+        "recent_attempt_count": 1,
+        "signup_coupon_account_count": 2,
+        "coupon_failure_count": 0,
+        "account_age_minutes": 2880.0,
+        "seat_count": 1,
+        "is_special_flight": false,
+        "uses_coupon": true,
+        "has_device_id": true,
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60,
+        "seconds_since_previous_account_attempt": null,
+        "prior_ip_account_count_60s": 0,
+        "prior_ip_attempt_count_60s": 0,
+        "prior_ip_same_flight_attempt_count_60s": 0,
+        "prior_ip_same_flight_ratio_60s": null
+      },
+      "passed": true
+    },
+    {
+      "scenario": "combined",
+      "description": "쿠폰 이력 + 기기 3계정 + IP 3계정",
+      "coupon_type": "none",
+      "before_score": 100,
+      "after_score": 70,
+      "before_decision": "BLOCKED",
+      "after_decision": "BLOCKED",
+      "before_hits": [
+        "MULTI_ACCOUNT_DEVICE",
+        "MULTI_ACCOUNT_IP",
+        "COUPON_FARMING"
+      ],
+      "after_hits": [
+        "MULTI_ACCOUNT_DEVICE",
+        "MULTI_ACCOUNT_IP"
+      ],
+      "features": {
+        "device_account_count": 3,
+        "ip_account_count": 3,
+        "seconds_since_sale_open": 86400.0,
+        "recent_attempt_count": 1,
+        "signup_coupon_account_count": 2,
+        "coupon_failure_count": 0,
+        "account_age_minutes": 2880.0,
+        "seat_count": 1,
+        "is_special_flight": false,
+        "uses_coupon": false,
+        "has_device_id": true,
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60,
+        "seconds_since_previous_account_attempt": null,
+        "prior_ip_account_count_60s": 0,
+        "prior_ip_attempt_count_60s": 0,
+        "prior_ip_same_flight_attempt_count_60s": 0,
+        "prior_ip_same_flight_ratio_60s": null
+      },
+      "passed": true
+    },
+    {
+      "scenario": "combined",
+      "description": "쿠폰 이력 + 기기 3계정 + IP 3계정",
+      "coupon_type": "signup",
+      "before_score": 100,
+      "after_score": 100,
+      "before_decision": "BLOCKED",
+      "after_decision": "BLOCKED",
+      "before_hits": [
+        "MULTI_ACCOUNT_DEVICE",
+        "MULTI_ACCOUNT_IP",
+        "COUPON_FARMING"
+      ],
+      "after_hits": [
+        "MULTI_ACCOUNT_DEVICE",
+        "MULTI_ACCOUNT_IP",
+        "COUPON_FARMING"
+      ],
+      "features": {
+        "device_account_count": 3,
+        "ip_account_count": 3,
+        "seconds_since_sale_open": 86400.0,
+        "recent_attempt_count": 1,
+        "signup_coupon_account_count": 3,
+        "coupon_failure_count": 0,
+        "account_age_minutes": 2880.0,
+        "seat_count": 1,
+        "is_special_flight": false,
+        "uses_coupon": true,
+        "has_device_id": true,
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60,
+        "seconds_since_previous_account_attempt": null,
+        "prior_ip_account_count_60s": 0,
+        "prior_ip_attempt_count_60s": 0,
+        "prior_ip_same_flight_attempt_count_60s": 0,
+        "prior_ip_same_flight_ratio_60s": null
+      },
+      "passed": true
+    },
+    {
+      "scenario": "combined",
+      "description": "쿠폰 이력 + 기기 3계정 + IP 3계정",
+      "coupon_type": "event",
+      "before_score": 100,
+      "after_score": 70,
+      "before_decision": "BLOCKED",
+      "after_decision": "BLOCKED",
+      "before_hits": [
+        "MULTI_ACCOUNT_DEVICE",
+        "MULTI_ACCOUNT_IP",
+        "COUPON_FARMING"
+      ],
+      "after_hits": [
+        "MULTI_ACCOUNT_DEVICE",
+        "MULTI_ACCOUNT_IP"
+      ],
+      "features": {
+        "device_account_count": 3,
+        "ip_account_count": 3,
+        "seconds_since_sale_open": 86400.0,
+        "recent_attempt_count": 1,
+        "signup_coupon_account_count": 2,
+        "coupon_failure_count": 0,
+        "account_age_minutes": 2880.0,
+        "seat_count": 1,
+        "is_special_flight": false,
+        "uses_coupon": true,
+        "has_device_id": true,
+        "behavior_feature_version": 1,
+        "behavior_window_seconds": 60,
+        "seconds_since_previous_account_attempt": null,
+        "prior_ip_account_count_60s": 0,
+        "prior_ip_attempt_count_60s": 0,
+        "prior_ip_same_flight_attempt_count_60s": 0,
+        "prior_ip_same_flight_ratio_60s": null
+      },
+      "passed": true
+    }
+  ]
+}

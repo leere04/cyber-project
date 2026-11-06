@@ -1,0 +1,10 @@
+|--- signup_coupon_account_count <= 1.50
+|   |--- class: 0
+|--- signup_coupon_account_count >  1.50
+|   |--- prior_ip_same_flight_attempt_count_60s <= 1.50
+|   |   |--- account_age_minutes <= 60.30
+|   |   |   |--- class: 1
+|   |   |--- account_age_minutes >  60.30
+|   |   |   |--- class: 1
+|   |--- prior_ip_same_flight_attempt_count_60s >  1.50
+|   |   |--- class: 1

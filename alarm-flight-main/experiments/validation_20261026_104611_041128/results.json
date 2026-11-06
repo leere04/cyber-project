@@ -1,0 +1,204 @@
+{
+  "scope": "격리된 합성 시나리오에서 현재 규칙 동작 검증. 실제 탐지 정확도 또는 AI 성능 평가가 아님.",
+  "results": [
+    {
+      "scenario": "independent",
+      "description": "각자 다른 IP·기기 정상 이용",
+      "sequence": 1,
+      "expected": "CONFIRMED",
+      "actual": "CONFIRMED",
+      "rule_score": 0.0,
+      "risk_score": 0.0,
+      "reasons": [],
+      "seats_before": 20,
+      "seats_after": 19,
+      "decision_matches": true,
+      "seat_check": true
+    },
+    {
+      "scenario": "independent",
+      "description": "각자 다른 IP·기기 정상 이용",
+      "sequence": 2,
+      "expected": "CONFIRMED",
+      "actual": "CONFIRMED",
+      "rule_score": 0.0,
+      "risk_score": 0.0,
+      "reasons": [],
+      "seats_before": 19,
+      "seats_after": 18,
+      "decision_matches": true,
+      "seat_check": true
+    },
+    {
+      "scenario": "independent",
+      "description": "각자 다른 IP·기기 정상 이용",
+      "sequence": 3,
+      "expected": "CONFIRMED",
+      "actual": "CONFIRMED",
+      "rule_score": 0.0,
+      "risk_score": 0.0,
+      "reasons": [],
+      "seats_before": 18,
+      "seats_after": 17,
+      "decision_matches": true,
+      "seat_check": true
+    },
+    {
+      "scenario": "shared_ip",
+      "description": "가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",
+      "sequence": 1,
+      "expected": "CONFIRMED",
+      "actual": "CONFIRMED",
+      "rule_score": 0.0,
+      "risk_score": 0.0,
+      "reasons": [],
+      "seats_before": 20,
+      "seats_after": 19,
+      "decision_matches": true,
+      "seat_check": true
+    },
+    {
+      "scenario": "shared_ip",
+      "description": "가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",
+      "sequence": 2,
+      "expected": "CONFIRMED",
+      "actual": "CONFIRMED",
+      "rule_score": 0.0,
+      "risk_score": 0.0,
+      "reasons": [],
+      "seats_before": 19,
+      "seats_after": 18,
+      "decision_matches": true,
+      "seat_check": true
+    },
+    {
+      "scenario": "shared_ip",
+      "description": "가족 3명: 같은 IP, 다른 기기, 쿠폰 없음",
+      "sequence": 3,
+      "expected": "CONFIRMED",
+      "actual": "CAPTCHA_REQUIRED",
+      "rule_score": 60.0,
+      "risk_score": 60.0,
+      "reasons": [
+        "MULTI_ACCOUNT_IP(+30): 같은 IP에서 여러 계정 사용 - IP 192.0.2.1 에서 계정 3개 (기준 3개)",
+        "RAPID_REPEAT(+30): 짧은 시간 동안 반복되는 예약 요청 - 60초 동안 3회 요청 (기준 3회)"
+      ],
+      "seats_before": 18,
+      "seats_after": 18,
+      "decision_matches": false,
+      "seat_check": true
+    },
+    {
+      "scenario": "shared_device",
+      "description": "공유 기기 2명: 다른 IP, 쿠폰 없음",
+      "sequence": 1,
+      "expected": "CONFIRMED",
+      "actual": "CONFIRMED",
+      "rule_score": 0.0,
+      "risk_score": 0.0,
+      "reasons": [],
+      "seats_before": 20,
+      "seats_after": 19,
+      "decision_matches": true,
+      "seat_check": true
+    },
+    {
+      "scenario": "shared_device",
+      "description": "공유 기기 2명: 다른 IP, 쿠폰 없음",
+      "sequence": 2,
+      "expected": "CAPTCHA_REQUIRED",
+      "actual": "CAPTCHA_REQUIRED",
+      "rule_score": 40.0,
+      "risk_score": 40.0,
+      "reasons": [
+        "MULTI_ACCOUNT_DEVICE(+40): 같은 기기에서 여러 계정 사용 - 기기 shared-test-device 에서 계정 2개 (기준 2개)"
+      ],
+      "seats_before": 19,
+      "seats_after": 19,
+      "decision_matches": true,
+      "seat_check": true
+    },
+    {
+      "scenario": "coupon_accounts",
+      "description": "같은 IP·기기 2계정 가입 쿠폰 사용",
+      "sequence": 1,
+      "expected": "CONFIRMED",
+      "actual": "CONFIRMED",
+      "rule_score": 0.0,
+      "risk_score": 0.0,
+      "reasons": [],
+      "seats_before": 20,
+      "seats_after": 19,
+      "decision_matches": true,
+      "seat_check": true
+    },
+    {
+      "scenario": "coupon_accounts",
+      "description": "같은 IP·기기 2계정 가입 쿠폰 사용",
+      "sequence": 2,
+      "expected": "BLOCKED",
+      "actual": "BLOCKED",
+      "rule_score": 70.0,
+      "risk_score": 70.0,
+      "reasons": [
+        "MULTI_ACCOUNT_DEVICE(+40): 같은 기기에서 여러 계정 사용 - 기기 shared-test-device 에서 계정 2개 (기준 2개)",
+        "COUPON_FARMING(+30): 같은 IP·기기에서 여러 계정의 가입 쿠폰 사용 - 가입 쿠폰 사용 계정 2개 (기준 2개)"
+      ],
+      "seats_before": 19,
+      "seats_after": 19,
+      "decision_matches": true,
+      "seat_check": true
+    },
+    {
+      "scenario": "repeat",
+      "description": "한 계정의 빠른 예약 요청 3회, 쿠폰 없음",
+      "sequence": 1,
+      "expected": "CONFIRMED",
+      "actual": "CONFIRMED",
+      "rule_score": 0.0,
+      "risk_score": 0.0,
+      "reasons": [],
+      "seats_before": 20,
+      "seats_after": 19,
+      "decision_matches": true,
+      "seat_check": true
+    },
+    {
+      "scenario": "repeat",
+      "description": "한 계정의 빠른 예약 요청 3회, 쿠폰 없음",
+      "sequence": 2,
+      "expected": "CONFIRMED",
+      "actual": "CONFIRMED",
+      "rule_score": 0.0,
+      "risk_score": 0.0,
+      "reasons": [],
+      "seats_before": 19,
+      "seats_after": 18,
+      "decision_matches": true,
+      "seat_check": true
+    },
+    {
+      "scenario": "repeat",
+      "description": "한 계정의 빠른 예약 요청 3회, 쿠폰 없음",
+      "sequence": 3,
+      "expected": "CONFIRMED",
+      "actual": "CONFIRMED",
+      "rule_score": 30.0,
+      "risk_score": 30.0,
+      "reasons": [
+        "RAPID_REPEAT(+30): 짧은 시간 동안 반복되는 예약 요청 - 60초 동안 3회 요청 (기준 3회)"
+      ],
+      "seats_before": 18,
+      "seats_after": 17,
+      "decision_matches": true,
+      "seat_check": true
+    }
+  ],
+  "all_checks_passed": false,
+  "interpretation": [
+    "기대 판정은 제공된 기본 규칙 점수 및 40/70 기준값에 맞춰 작성됨. 설정 변경 시 불일치 가능.",
+    "공유 기기 정상 이용자도 추가 인증 대상이 될 수 있음.",
+    "RAPID_REPEAT 단독 점수 30은 인증 기준 40보다 낮으므로 반복 요청만으로는 제한되지 않음.",
+    "실제 정상/부정 라벨이 있는 독립 데이터셋이 없으므로 정확도·오탐률을 계산하지 않음."
+  ]
+}
